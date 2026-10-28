@@ -1,4 +1,4 @@
 [submodule "core"]
 	path = core
-	url = https://github.com/d34faiza-commits/clau-core.git
+	url = https://github.com/deakasep/core.git
 	branch = main
