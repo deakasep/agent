@@ -33,7 +33,7 @@ Prinsip yang perlu diingat:
 ## 2. Clone Pertama Kali
 
 ```bash
-git clone --recurse-submodules https://github.com/d34faiza-commits/clau-market.git
+git clone --recurse-submodules https://github.com/deakasep/market.git
 
 # Kalau sudah ter-clone tanpa submodule (folder core/ atau agents/ kosong):
 git submodule update --init --recursive

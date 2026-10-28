@@ -18,7 +18,7 @@ jobs:
     env:
       HAS_TOKEN: ${{ secrets.SUBMODULE_TOKEN != '' }}
       GH_TOKEN: ${{ secrets.SUBMODULE_TOKEN }}
-      TARGETS: d34faiza-commits/clau-market
+      TARGETS: deakasep/market
     steps:
       - name: Token check
         if: env.HAS_TOKEN != 'true'

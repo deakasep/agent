@@ -18,7 +18,7 @@ set -euo pipefail
 
 ROOT=/srv/clau
 REPO="$ROOT/clau-ai-agents"
-REPO_URL="${CLAU_REPO_URL:-https://github.com/d34faiza-commits/clau-agent.git}"
+REPO_URL="${CLAU_REPO_URL:-https://github.com/deakasep/agent.git}"
 DEPLOY_HOME=/var/lib/clau-deploy
 ADMIN="${SUDO_USER:-}"
 
