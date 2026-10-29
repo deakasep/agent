@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import CreditAlert from "./CreditAlert";
 import Icon, { type IconName } from "./Icon";
 import UserMenu from "./UserMenu";
 import Logo from "./Logo";
@@ -141,7 +142,10 @@ export default function AppShell({ children, activeAgents }: { children: ReactNo
           </button>
           <UserMenu />
         </header>
-        <main className="content">{children}</main>
+        <main className="content">
+          <CreditAlert />
+          {children}
+        </main>
       </div>
     </div>
   );

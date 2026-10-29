@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Card, Kpi, PageHeader } from "../../components/ui";
 import { Field, Notice } from "../../components/WorkflowUi";
 import { api, errorText, isOwner, type Me } from "../../lib/auth";
-import { REASON, rupiah, type Catalog, type CreditEntry, type Payment, type Wallet } from "../../lib/billing";
+import { LOW_CREDITS, REASON, rupiah, type Catalog, type CreditEntry, type Payment, type Wallet } from "../../lib/billing";
 import { L, useL, useLang } from "../../lib/i18n";
 import { formatDate, type Client } from "../../lib/workflow";
 
@@ -95,7 +95,7 @@ export default function BillingPage() {
       </>
     );
 
-  const low = wallet && !wallet.simulation && wallet.balance.total < 50;
+  const low = wallet && !wallet.simulation && wallet.balance.total < LOW_CREDITS;
   return (
     <>
       {header}

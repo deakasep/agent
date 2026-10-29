@@ -42,6 +42,9 @@ export type Payment = {
   payment_url?: string | null;
 };
 
+/** Batas pemberitahuan "kredit menipis" (≈ 10% dari 500 kredit bulanan). */
+export const LOW_CREDITS = 50;
+
 export const rupiah = (n: number) => "Rp" + n.toLocaleString("id-ID");
 
 export const REASON: Record<CreditEntry["reason"], [string, string]> = {

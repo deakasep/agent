@@ -43,14 +43,17 @@ def entry_json(e: CreditEntry) -> dict:
     }
 
 
-def payment_json(p: Payment, payment_url: str | None = None) -> dict:
+_NO_URL = object()
+
+
+def payment_json(p: Payment, payment_url: object = _NO_URL) -> dict:
     out = {
         "id": p.id, "client_code": p.client_code, "kind": p.kind, "plan_months": p.plan_months, "credits": p.credits,
         "amount_idr": p.amount_idr, "provider": p.provider, "order_id": p.order_id, "status": p.status, "method": p.method,
         "requested_by": p.requested_by, "created_at": iso(p.created_at), "paid_at": iso(p.paid_at),
     }
-    if payment_url is not None:
-        out["payment_url"] = payment_url
+    if payment_url is not _NO_URL:
+        out["payment_url"] = payment_url  # checkout: URL Snap, atau None untuk mode uji
     return out
 
 
@@ -87,7 +90,7 @@ def list_ledger(client_code: str = Query(pattern=CLIENT_CODE_RE), p: Page = Depe
     require_client(db, ctx, client_code)
     stmt = select(CreditEntry).where(CreditEntry.client_code == client_code).order_by(CreditEntry.created_at.desc(), CreditEntry.id.desc())
     rows, total = paged(db, stmt, p)
-    return {"items": [entry_json(e) for e in rows], "total": total, "limit": p.limit, "offset": p.offset}
+    return {"items": [entry_json(e) for (e,) in rows], "total": total, "limit": p.limit, "offset": p.offset}
 
 
 @router.get("/payments")
@@ -100,7 +103,7 @@ def list_payments(client_code: str | None = Query(None, pattern=CLIENT_CODE_RE),
     if client_code:
         stmt = stmt.where(Payment.client_code == client_code)
     rows, total = paged(db, stmt, p)
-    return {"items": [payment_json(x) for x in rows], "total": total, "limit": p.limit, "offset": p.offset}
+    return {"items": [payment_json(x) for (x,) in rows], "total": total, "limit": p.limit, "offset": p.offset}
 
 
 class CheckoutIn(Body):
