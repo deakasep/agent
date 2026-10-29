@@ -85,7 +85,8 @@ def test_full_flow_without_staff(factory, team, shop, monkeypatch):
     r = ask_ai(owner, req["id"])
     assert r.status_code == 202, r.text
     assert owner.get("/billing/wallet", client_code="WARUNG").json()["balance"]["total"] < 5000  # kredit terpotong
-    claims = [ClaimOut("Kopi susu Rp18.000", "price", "price.kopi-susu")]
+    # Pemeriksa fakta hanya meloloskan kutipan persis (nilai, atau "label: nilai"), bukan parafrase.
+    claims = [ClaimOut("Harga kopi susu: Rp18.000", "price", "price.kopi-susu")]
     assert run_all(factory, StubProvider(claims=claims)) == ["succeeded"]
     draft = owner.get("/drafts", request_id=req["id"]).json()["items"][0]
     detail = owner.get(f"/drafts/{draft['id']}").json()
@@ -109,11 +110,14 @@ def test_unconfirmed_claims_still_block_self_serve_approval(factory, team, shop,
     assert owner.post("/approvals", {"draft_id": draft["id"], "level": "L3", "decision": "Revise"}).status_code == 201
 
 
-def test_owner_can_cancel_own_queued_job_only(factory, team, shop):
+def test_owner_can_cancel_own_queued_job_only(factory, team, shop, monkeypatch):
+    monkeypatch.setenv("CLAU_AI_PROVIDER", "stub")
     owner = shop["a"]
     assert write_brain(owner).status_code == 201
     req = new_request(owner, client="WARUNG")
-    job = ask_ai(owner, req["id"]).json()
+    r = ask_ai(owner, req["id"])
+    assert r.status_code == 202, r.text
+    job = r.json()
     assert shop["b"].post(f"/ai-jobs/{job['id']}/cancel", {}).status_code == 404
     r = owner.post(f"/ai-jobs/{job['id']}/cancel", {})
     assert r.status_code == 200 and r.json()["status"] == "cancelled"
