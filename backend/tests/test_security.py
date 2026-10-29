@@ -118,6 +118,11 @@ ENDPOINTS = {
     # AI menulis draft (0.9.0): hanya membuat/membaca/membatalkan job; draft dibuat worker, tanpa publish.
     ("POST", "/requests/{request_id}/ai-drafts"), ("GET", "/ai-jobs"), ("GET", "/ai-jobs/{job_id}"),
     ("POST", "/ai-jobs/{job_id}/cancel"), ("GET", "/ai-usage"), ("PUT", "/ai-budgets"),
+    # Langganan & kredit (0.11.0): katalog publik, saldo & riwayat per klien, tagihan; lunas hanya dari webhook
+    # bertanda tangan atau simulasi owner (provider fake, non-produksi). Tanpa data kartu/rekening.
+    ("GET", "/billing/catalog"), ("GET", "/billing/wallet"), ("GET", "/billing/ledger"), ("GET", "/billing/payments"),
+    ("POST", "/billing/checkout"), ("POST", "/billing/payments/{payment_id}/simulate-paid"),
+    ("POST", "/billing/webhooks/midtrans"), ("POST", "/billing/adjustments"),
 }
 
 

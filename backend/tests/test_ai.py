@@ -145,6 +145,10 @@ def ai(factory, team):
     sheet = fact_sheet(factory, client="CTHSIM", keys=("facility.pool-private", "location.ubud"), confirmer=sim_approver.id)
     real_sheet = fact_sheet(factory, client="CTH", keys=("facility.pool-private",), confirmer=team["approver"].id)
     put_budget(team["owner"], 50_000_000)
+    # Model langganan (migrasi 0008): job AI klien NYATA memotong kredit; klien uji diberi kredit oleh owner.
+    for code in ("CTH", "CTHB"):
+        r = team["owner"].post("/billing/adjustments", {"client_code": code, "credits": 5000, "note": "kredit uji test_ai"})
+        assert r.status_code == 201, r.text
     return {"sim_approver": sim_approver, "sheet": sheet, "real_sheet": real_sheet}
 
 

@@ -84,6 +84,10 @@ services:
       CLAU_AI_PROVIDER: ${CLAU_AI_PROVIDER:-fake}
       CLAU_AI_INTENTS: ${CLAU_AI_INTENTS:-caption}
       CLAU_AI_JOB_ESTIMATE_MICRO_USD: ${CLAU_AI_JOB_ESTIMATE_MICRO_USD:-}
+      # Langganan & kredit (api-contracts 0.11.0): fake = mode uji; midtrans butuh server key (secret, .env 600).
+      CLAU_PAYMENT_PROVIDER: ${CLAU_PAYMENT_PROVIDER:-fake}
+      CLAU_MIDTRANS_SERVER_KEY: ${CLAU_MIDTRANS_SERVER_KEY:-}
+      CLAU_MIDTRANS_PRODUCTION: ${CLAU_MIDTRANS_PRODUCTION:-}
     ports: ["127.0.0.1:${CLAU_BACKEND_PORT:-8000}:8000"]
     tmpfs: [/tmp]
     depends_on:

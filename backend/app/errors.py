@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-# Kode aturan dari trigger database (migrasi 0001, 0004–0007) yang boleh diteruskan ke klien apa adanya.
+# Kode aturan dari trigger database (migrasi 0001, 0004–0008) yang boleh diteruskan ke klien apa adanya.
 DB_RULE_RE = re.compile(r"\b([a-z]+(?:_[a-z]+)+): ")
 DB_RULES = {
     "qa_reviewer_is_author",
@@ -46,6 +46,12 @@ DB_RULES = {
     "source_draft_required",
     "source_draft_invalid",
     "flag_not_removable",
+    # Migrasi 0008 (langganan & kredit, kontrak core 0.11.0).
+    "payment_transition",
+    "subscription_payment_mismatch",
+    "credit_entry_invalid",
+    "credit_insufficient",
+    "billing_record_append_only",
 }
 
 
@@ -66,6 +72,10 @@ DB_CHECKS = {
     "ck_claims_data_final_sourced": "claim_source_required",
     "uq_ai_jobs_one_active": "ai_job_active",
     "uq_draft_flags_active": "flag_exists",
+    "uq_credit_ledger_monthly": "credit_entry_invalid",
+    "uq_credit_ledger_topup": "credit_entry_invalid",
+    "uq_credit_ledger_job": "credit_entry_invalid",
+    "uq_subscriptions_payment_id": "subscription_payment_mismatch",
 }
 
 

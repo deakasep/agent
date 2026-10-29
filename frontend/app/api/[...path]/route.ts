@@ -6,7 +6,7 @@ import type { NextRequest } from "next/server";
 export const dynamic = "force-dynamic";
 
 // Hanya awalan endpoint yang memang untuk browser (core/shared/api-contracts.md).
-const ALLOWED = /^(auth|users|agents|pillars|route|health|requests|drafts|qa-records|approvals|clients|fact-sheets|ai-jobs|ai-usage|ai-budgets)(\/[A-Za-z0-9_\-/]*)?$/;
+const ALLOWED = /^(auth|users|agents|pillars|route|health|requests|drafts|qa-records|approvals|clients|fact-sheets|ai-jobs|ai-usage|ai-budgets|billing)(\/[A-Za-z0-9_\-/]*)?$/;
 const FORWARD_REQUEST = ["content-type", "cookie", "x-csrf-token", "origin", "sec-fetch-site", "accept", "user-agent"];
 const MAX_BODY = 64 * 1024; // sama dengan batas backend (MAX_BODY_BYTES)
 

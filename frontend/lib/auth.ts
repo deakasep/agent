@@ -144,6 +144,20 @@ const MESSAGES: Record<string, [en: string, id: string]> = {
   flag_exists: ["This flag is already on the draft.", "Penanda ini sudah ada di draft."],
   flag_not_removable: ["Flags set automatically by the system can't be removed. Save a corrected new version instead.", "Penanda otomatis dari sistem tidak bisa dihapus. Simpan versi baru yang sudah diperbaiki."],
   flag_not_active: ["This flag is no longer on the draft.", "Penanda ini sudah tidak ada di draft."],
+  // Langganan & kredit (API 0.11.0, migrasi 0008).
+  credits_insufficient: ["Not enough credits for this job. Top up from Credits & plan.", "Kredit tidak cukup untuk pekerjaan ini. Top up di Kredit & paket."],
+  credit_insufficient: ["Not enough credits.", "Kredit tidak cukup."],
+  credit_entry_invalid: ["This credit change isn't allowed.", "Perubahan kredit ini tidak diizinkan."],
+  credit_cost_missing: ["No credit price is set for this job type yet.", "Tarif kredit untuk jenis pekerjaan ini belum diatur."],
+  payment_transition: ["This invoice is already finished.", "Tagihan ini sudah selesai."],
+  subscription_payment_mismatch: ["A plan needs a matching paid invoice.", "Paket butuh tagihan lunas yang sesuai."],
+  billing_record_append_only: ["Billing records can't be changed or deleted.", "Catatan tagihan & kredit tidak bisa diubah atau dihapus."],
+  invalid_plan: ["Choose one of the available plans.", "Pilih paket yang tersedia."],
+  payment_pending_exists: ["You still have an unpaid invoice. Pay it or wait until it expires.", "Masih ada tagihan belum dibayar. Bayar atau tunggu kedaluwarsa."],
+  billing_disabled: ["Payments are not available right now.", "Pembayaran sedang tidak tersedia."],
+  payment_gateway_unavailable: ["The payment gateway can't be reached. Try again.", "Payment gateway tidak bisa dihubungi. Coba lagi."],
+  payment_not_pending: ["This invoice is already finished.", "Tagihan ini sudah selesai."],
+  billing_simulation_disabled: ["Test payments are not available here.", "Pembayaran uji tidak tersedia di sini."],
 };
 
 /** Pesan error sesuai bahasa aktif. weak_password memakai alasan dari server (bahasa Indonesia). */

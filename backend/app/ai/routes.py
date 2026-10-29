@@ -18,6 +18,8 @@ from app.ai.budget import budget_problem, month_bounds, month_start, spent
 from app.ai.config import ai_settings
 from app.ai.factcheck import latest_approved_sheet
 from app.auth.deps import AuthContext, current_user, get_db, require_owner
+from app.billing.catalog import credit_cost
+from app.billing.ledger import charge
 from app.db.models import AI_JOB_STATUSES, CLIENT_CODE_RE, AiBudget, AiCall, AiJob, Client, Request
 from app.errors import ApiError
 from app.registry import agent_for_intent
@@ -78,7 +80,16 @@ def create_ai_draft(request_id: int, ctx: AuthContext = Depends(current_user), d
     job = AiJob(request_id=req.id, agent_id=agent["id"], intent=req.intent, kind="draft", fact_sheet_id=sheet.id, requested_by=ctx.user.id)
     db.add(job)
     db.flush()  # indeks unik: satu job aktif per request (ai_job_active)
-    audit(db, ctx, "ai_job.create", "ai_job", job.id, request_id=req.id, agent_id=job.agent_id, fact_sheet_id=sheet.id)
+    # Kredit (AI-CONSTITUTION v4.0.0 §4b): dipotong di transaksi yang sama, sebelum model dipanggil; kurang = 402 dan
+    # job ikut batal (rollback). Gagal/dibatalkan = kredit kembali (trigger migrasi 0008). Klien SIMULASI = mode uji.
+    credits = 0
+    if not client.simulation:
+        cost = credit_cost(req.intent)
+        if cost is None:
+            raise ApiError(409, "credit_cost_missing", "Tarif kredit untuk jenis pekerjaan ini belum diatur.")
+        charge(db, req.client_code, cost, job.id)
+        credits = cost
+    audit(db, ctx, "ai_job.create", "ai_job", job.id, request_id=req.id, agent_id=job.agent_id, fact_sheet_id=sheet.id, credits=credits)
     db.commit()
     return job_json(job, req.client_code)
 
