@@ -3,6 +3,7 @@ import Avatar from "../components/Avatar";
 import GenerateRun from "../components/GenerateRun";
 import Icon from "../components/Icon";
 import MemberCard from "../components/MemberCard";
+import Onboarding from "../components/Onboarding";
 import { Card, Kpi, Level, Progress, SimNotice, StatusBadge } from "../components/ui";
 import { ACTIVITY, CLIENTS, CONTENT, PROJECTS, SIM_DATE, clientName } from "../lib/demo";
 import { D, Greeting, L } from "../lib/i18n";
@@ -47,6 +48,8 @@ export default function Dashboard() {
           ))}
         </div>
       </section>
+
+      <Onboarding />
 
       <SimNotice />
 

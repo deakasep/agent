@@ -11,7 +11,7 @@ import { api, errorText, type Me } from "../../../lib/auth";
 import { L, useL, useLang } from "../../../lib/i18n";
 import {
   AGENCY_WRITERS, CLAIM_CATEGORIES, CONTENT_FLAGS, DECISIONS, EVIDENCE_LABELS, FACTUAL, FLAG_LABEL, FLAG_LEVEL, FLAG_SOURCE_LABEL,
-  LEVELS, QA_GATES, QA_RESULTS, REF_RE, SENIOR, formatDate, levelReason, memberFor, roleFor, useSession,
+  LEVELS, QA_GATES, QA_RESULTS, REF_RE, SENIOR, formatDate, isSelfServeOwner, levelReason, memberFor, roleFor, useClients, useSession,
   type Approval, type Claim, type ContentFlag, type Draft, type DraftSummary, type Fact, type FactSheet, type FactSheetDetail, type Page, type QARecord, type WfRequest,
 } from "../../../lib/workflow";
 
@@ -24,6 +24,7 @@ export default function RequestDetail() {
   const tr = useL();
   const { lang } = useLang();
   const { me, state } = useSession();
+  const clients = useClients(state === "ready");
   const [req, setReq] = useState<WfRequest | null>(null);
   const [drafts, setDrafts] = useState<DraftSummary[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
@@ -84,6 +85,8 @@ export default function RequestDetail() {
   const latest = drafts[0];
   // Draft agent: "pembuat" = peminta job AI (rule 08; database menolak review/approval oleh peminta).
   const author = draft ? draftAuthor(draft, aiJobs) : null;
+  // Langganan mandiri (0.13.0): pemilik usaha meminta draft AI dan menyetujuinya sendiri (AI-CONSTITUTION §11).
+  const selfServe = isSelfServeOwner(me, clients.find((c) => c.client_code === req.client_code));
 
   return (
     <>
@@ -139,8 +142,8 @@ export default function RequestDetail() {
         </div>
 
         <div className="stack">
-          <AiPanel requestId={req.id} canAsk={open && AGENCY_WRITERS.has(role)} onJobs={setAiJobs} onDraft={() => load(true)} />
-          {open && draft && draft.id === latest?.id && <DecisionForm key={draft.id} me={me} req={req} draft={draft} author={author} onDone={() => load(true)} />}
+          <AiPanel requestId={req.id} canAsk={open && (AGENCY_WRITERS.has(role) || selfServe)} selfServe={selfServe} onJobs={setAiJobs} onDraft={() => load(true)} />
+          {open && draft && draft.id === latest?.id && <DecisionForm key={draft.id} me={me} req={req} draft={draft} author={author} selfServe={selfServe} onDone={() => load(true)} />}
           {open && draft && AGENCY_WRITERS.has(role) && <QAForm key={draft.id} me={me} role={role} draft={draft} author={author} onDone={() => loadDraft(draft.id)} />}
           {/* Pesan di luar form: form dipasang ulang dari versi terbaru setelah tersimpan. */}
           <Notice msg={saved} />
@@ -244,7 +247,7 @@ function Records({ rows, head, empty, statusCol }: { rows: ReactNode[][]; head: 
   );
 }
 
-function DecisionForm({ me, req, draft, author, onDone }: { me: Me; req: WfRequest; draft: Draft; author: number | null; onDone: () => void }) {
+function DecisionForm({ me, req, draft, author, selfServe, onDone }: { me: Me; req: WfRequest; draft: Draft; author: number | null; selfServe: boolean; onDone: () => void }) {
   const tr = useL();
   const { lang } = useLang();
   const member = memberFor(me, req.client_code);
@@ -262,7 +265,8 @@ function DecisionForm({ me, req, draft, author, onDone }: { me: Me; req: WfReque
   const [ref, setRef] = useState("");
   const [msg, setMsg] = useState<Msg>(null);
   if (!SENIOR.has(role) && role !== "client_approver") return null;
-  if (author === me.user.id)
+  // Draft agen di langganan mandiri: pembuatnya agen AI, pemilik usaha yang memutuskan.
+  if (author === me.user.id && !(selfServe && draft.created_by === null))
     return <Card><p className="muted">{draft.created_by === null
       ? tr("You asked the AI for this draft, so someone else must decide on it.", "Kamu yang meminta draft AI ini, jadi orang lain yang memutuskan.")
       : tr("You wrote this draft, so someone else must decide on it.", "Kamu yang menulis draft ini, jadi orang lain yang memutuskan.")}</p></Card>;
@@ -303,7 +307,9 @@ function DecisionForm({ me, req, draft, author, onDone }: { me: Me; req: WfReque
           </Field>
         )}
         {(level === "L2" || level === "L3") && decision === "Approved" && (
-          <p className="muted wf-hint">{tr("L2/L3 needs a passed independent claim verification on this draft.", "L2/L3 butuh claim verification independen yang lulus di draft ini.")}</p>
+          <p className="muted wf-hint">{selfServe
+            ? tr("Read the whole draft first: your approval is the final human check. Claims marked RISK must be fixed or added to your business Brain.", "Baca seluruh draft dulu: persetujuanmu adalah pemeriksaan manusia terakhir. Klaim bertanda RISK harus diperbaiki atau ditambahkan ke Brain bisnis.")
+            : tr("L2/L3 needs a passed independent claim verification on this draft.", "L2/L3 butuh claim verification independen yang lulus di draft ini.")}</p>
         )}
         <Notice msg={msg} />
         <button type="submit" className="btn btn--primary" disabled={!level || (needsRef && !REF_RE.test(ref.trim()))}>{tr("Record decision", "Catat keputusan")}</button>

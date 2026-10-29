@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { Card, PageHeader } from "../../components/ui";
 import { Field, Notice, SessionGate, StatusPill } from "../../components/WorkflowUi";
-import { api, errorText } from "../../lib/auth";
+import { api, errorText, type Me } from "../../lib/auth";
 import { L, useL, useLang } from "../../lib/i18n";
-import { AGENCY_WRITERS, FACTUAL, FACT_KEY_RE, REF_RE, formatDate, roleFor, useSession, type Client, type FactSheet, type FactSheetDetail, type Page } from "../../lib/workflow";
+import { AGENCY_WRITERS, FACTUAL, FACT_KEY_RE, REF_RE, formatDate, isSelfServeOwner, roleFor, useSession, type Client, type FactSheet, type FactSheetDetail, type Page } from "../../lib/workflow";
 
 type Row = { category: string; slug: string; label: string; value: string };
 const EMPTY: Row = { category: "facility", slug: "", label: "", value: "" };
@@ -39,7 +39,7 @@ export default function FactSheetsPage() {
     />
   );
   if (state !== "ready" || !me) return <>{header}<SessionGate state={state} /></>;
-  const writable = clients.filter((c) => AGENCY_WRITERS.has(roleFor(me, c.client_code)));
+  const writable = clients.filter((c) => AGENCY_WRITERS.has(roleFor(me, c.client_code)) || isSelfServeOwner(me, c));
 
   return (
     <>
@@ -76,13 +76,13 @@ export default function FactSheetsPage() {
             </div>
           )}
         </Card>
-        {writable.length > 0 && <NewFactSheet clients={writable} onCreated={load} />}
+        {writable.length > 0 && <NewFactSheet me={me} clients={writable} onCreated={load} />}
       </div>
     </>
   );
 }
 
-function NewFactSheet({ clients, onCreated }: { clients: Client[]; onCreated: () => void }) {
+function NewFactSheet({ me, clients, onCreated }: { me: Me; clients: Client[]; onCreated: () => void }) {
   const tr = useL();
   const { lang } = useLang();
   const [client, setClient] = useState(clients[0]?.client_code ?? "");
@@ -105,24 +105,28 @@ function NewFactSheet({ clients, onCreated }: { clients: Client[]; onCreated: ()
   function setRow(i: number, patch: Partial<Row>) {
     setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
   }
+  // Langganan mandiri (0.13.0): pemilik usaha menulis Brain bisnisnya sendiri; langsung berlaku tanpa dokumen sumber.
+  const own = isSelfServeOwner(me, clients.find((c) => c.client_code === client));
   const keyOf = (r: Row) => `${r.category}.${r.slug}`;
   const keys = rows.map(keyOf);
-  const valid = REF_RE.test(ref) && rows.length > 0 && rows.every((r) => FACT_KEY_RE.test(keyOf(r)) && r.label.trim() && r.value.trim()) && new Set(keys).size === keys.length;
+  const valid = (own ? !ref.trim() || REF_RE.test(ref.trim()) : REF_RE.test(ref)) && rows.length > 0 && rows.every((r) => FACT_KEY_RE.test(keyOf(r)) && r.label.trim() && r.value.trim()) && new Set(keys).size === keys.length;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     const facts = rows.map((r) => ({ fact_key: keyOf(r), category: r.category, label: r.label, value: r.value }));
-    const r = await api<FactSheetDetail>("fact-sheets", { method: "POST", body: { client_code: client, document_ref: ref.trim(), facts } });
+    const r = await api<FactSheetDetail>("fact-sheets", { method: "POST", body: { client_code: client, ...(ref.trim() ? { document_ref: ref.trim() } : {}), facts } });
     if (r.ok) {
       setCreated(r.data.id);
-      setMsg({ ok: true, text: tr(`Version ${r.data.version} created. Ask the client to confirm each fact.`, `Versi ${r.data.version} dibuat. Minta klien mengonfirmasi setiap fakta.`) });
+      setMsg({ ok: true, text: r.data.status === "approved"
+        ? tr(`Business Brain v${r.data.version} saved. Your agents use these facts from now on.`, `Brain bisnis v${r.data.version} tersimpan. Agen memakai fakta ini mulai sekarang.`)
+        : tr(`Version ${r.data.version} created. Ask the client to confirm each fact.`, `Versi ${r.data.version} dibuat. Minta klien mengonfirmasi setiap fakta.`) });
       setRows([{ ...EMPTY }]);
       onCreated();
     } else setMsg({ ok: false, text: errorText(r, lang) });
   }
 
   return (
-    <Card title={<L en="New fact sheet version" id="Versi fact sheet baru" />}>
+    <Card title={own ? <L en="Business Brain" id="Brain bisnis" /> : <L en="New fact sheet version" id="Versi fact sheet baru" />}>
       <form onSubmit={submit} className="auth-form">
         <Field id="fs-client" label={tr("Client", "Klien")}>
           <select id="fs-client" value={client} onChange={(e) => setClient(e.target.value)}>
@@ -130,9 +134,13 @@ function NewFactSheet({ clients, onCreated }: { clients: Client[]; onCreated: ()
           </select>
         </Field>
         <button type="button" className="btn btn--secondary btn--sm" onClick={copyLatest}>{tr("Start from the latest version", "Mulai dari versi terakhir")}</button>
-        <Field id="fs-ref" label={tr("Source document (link)", "Dokumen sumber (link)")} hint={tr("Where the full fact sheet lives in the client workspace (https:// or workspace://).", "Lokasi fact sheet lengkap di workspace klien (https:// atau workspace://).")}>
-          <input id="fs-ref" value={ref} onChange={(e) => setRef(e.target.value)} required maxLength={500} placeholder="workspace://" />
-        </Field>
+        {own ? (
+          <p className="muted wf-hint">{tr("Write the facts about your business that agents may use: prices, facilities, opening hours, location. What you save here counts as confirmed by you and applies right away; a new save creates a new version.", "Tulis fakta usahamu yang boleh dipakai agen: harga, fasilitas, jam buka, lokasi. Yang kamu simpan di sini dianggap sudah kamu konfirmasi dan langsung berlaku; simpan ulang = versi baru.")}</p>
+        ) : (
+          <Field id="fs-ref" label={tr("Source document (link)", "Dokumen sumber (link)")} hint={tr("Where the full fact sheet lives in the client workspace (https:// or workspace://).", "Lokasi fact sheet lengkap di workspace klien (https:// atau workspace://).")}>
+            <input id="fs-ref" value={ref} onChange={(e) => setRef(e.target.value)} required maxLength={500} placeholder="workspace://" />
+          </Field>
+        )}
         <fieldset className="wf-claims">
           <legend>{tr("Facts", "Fakta")}</legend>
           {rows.map((r, i) => (
@@ -151,7 +159,7 @@ function NewFactSheet({ clients, onCreated }: { clients: Client[]; onCreated: ()
         </fieldset>
         <Notice msg={msg} />
         {created && <Link className="link" href={`/fact-sheets/${created}`}>{tr("Open the new version", "Buka versi baru")} →</Link>}
-        <button type="submit" className="btn btn--primary" disabled={!valid}>{tr("Create version", "Buat versi")}</button>
+        <button type="submit" className="btn btn--primary" disabled={!valid}>{own ? tr("Save Brain", "Simpan Brain") : tr("Create version", "Buat versi")}</button>
       </form>
     </Card>
   );

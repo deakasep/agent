@@ -31,7 +31,7 @@ export default function AppShell({ children, activeAgents }: { children: ReactNo
       id: "Workspace",
       items: [
         { href: "/requests", en: "Requests", id: "Permintaan", icon: "inbox" },
-        { href: "/fact-sheets", en: "Fact sheets", id: "Fact sheet", icon: "shield" },
+        { href: "/fact-sheets", en: "Business Brain", id: "Brain bisnis", icon: "shield" },
         { href: "/clients", en: "Clients", id: "Klien", icon: "users" },
         { href: "/projects", en: "Projects", id: "Proyek", icon: "folder" },
         { href: "/content", en: "Content", id: "Konten", icon: "content" },

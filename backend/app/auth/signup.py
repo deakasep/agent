@@ -154,7 +154,7 @@ def signup(body: SignupIn, request: Request, db: Session = Depends(get_db), sett
 
     code = client_code_for(db, body.business_name)
     db.add(Client(client_code=code, vertical=body.vertical, business_type=body.business_type.strip(),
-                  location_area=(body.location_area or "").strip() or None, approver_role="pemilik", simulation=False))
+                  location_area=(body.location_area or "").strip() or None, approver_role="pemilik", simulation=False, self_serve=True))
     user = User(display_name=body.display_name.strip(), email=email, locale="id", timezone=body.timezone,
                 password_hash=password_hash, must_change_password=False, email_verified_at=null())
     db.add(user)
