@@ -22,7 +22,7 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, Request, Response
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import func, select, update
+from sqlalchemy import func, null, select, update
 from sqlalchemy.orm import Session
 
 from app import mail
@@ -156,7 +156,7 @@ def signup(body: SignupIn, request: Request, db: Session = Depends(get_db), sett
     db.add(Client(client_code=code, vertical=body.vertical, business_type=body.business_type.strip(),
                   location_area=(body.location_area or "").strip() or None, approver_role="pemilik", simulation=False))
     user = User(display_name=body.display_name.strip(), email=email, locale="id", timezone=body.timezone,
-                password_hash=password_hash, must_change_password=False, email_verified_at=None)
+                password_hash=password_hash, must_change_password=False, email_verified_at=null())
     db.add(user)
     db.flush()
     db.add(Membership(user_id=user.id, scope=code, role="client_approver", max_level="L3"))

@@ -1,7 +1,7 @@
 """Pengiriman email transaksional (verifikasi email, reset password). Tanpa dependency baru: smtplib stdlib.
 
 CLAU_MAIL_BACKEND:
-- `smtp`     : kirim lewat server SMTP (CLAU_SMTP_*). Wajib di produksi bila pendaftaran mandiri dibuka.
+- `smtp`     : kirim lewat server SMTP (CLAU_SMTP_HOST, CLAU_SMTP_PORT, dst.). Wajib di produksi bila pendaftaran mandiri dibuka.
 - `file`     : tulis email ke folder CLAU_MAIL_DIR (development saja; ditolak di CLAU_ENV=production).
 - `memory`   : simpan di `outbox` (test).
 - `disabled` : tidak mengirim apa pun (default). Pendaftaran mandiri menolak berjalan tanpa backend kirim.

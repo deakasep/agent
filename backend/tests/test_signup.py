@@ -175,9 +175,6 @@ def test_per_email_and_hourly_limits(open_signup, monkeypatch):
 
 
 def test_signup_requires_allowed_origin(open_signup):
-    from fastapi.testclient import TestClient
-
-    from app.main import app
-
-    evil = TestClient(app, base_url="https://testserver", headers={"origin": "https://evil.example"})
+    evil = client()  # app yang sama dengan override database (test lain bisa me-reload app.main)
+    evil.headers["origin"] = "https://evil.example"
     assert evil.post("/auth/signup", json=form()).status_code == 403

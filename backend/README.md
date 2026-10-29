@@ -184,7 +184,7 @@ Sumber aturan: core AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0 § Token Kana
 | Kirim ulang verifikasi | `POST /auth/verification-email` | Respons selalu sama |
 | Lupa / reset password | `POST /auth/password-reset`, `/auth/password-reset/confirm` | Token 60 menit; semua sesi diputus; 2FA tetap diminta |
 
-- **Mati secara default.** Buka dengan `CLAU_SIGNUP_ENABLED=1` **dan** email yang siap: `CLAU_MAIL_BACKEND=smtp` + `CLAU_SMTP_*` + `CLAU_MAIL_FROM`. Tautan di email memakai `CLAU_PUBLIC_ORIGIN` (alamat dashboard, mis. `https://app.domain-anda.com`).
+- **Mati secara default.** Buka dengan `CLAU_SIGNUP_ENABLED=1` **dan** email yang siap: `CLAU_MAIL_BACKEND=smtp` + `CLAU_SMTP_HOST`/`PORT`/`USER`/`PASSWORD` + `CLAU_MAIL_FROM`. Tautan di email memakai `CLAU_PUBLIC_ORIGIN` (alamat dashboard, mis. `https://app.domain-anda.com`).
 - Lokal: `CLAU_MAIL_BACKEND=file CLAU_MAIL_DIR=./mail-dev` menulis email `.eml` ke folder (ditolak di produksi).
 - Respons daftar, kirim ulang, dan lupa password sama untuk email terdaftar maupun tidak; batas 3/jam per email dan `CLAU_SIGNUP_MAX_PER_HOUR` (default 30) total. Tambah juga `limit_req` Nginx per IP untuk `/api/auth/` saat deploy.
 - Akun daftar mandiri baru bisa login setelah email terverifikasi (403 `email_not_verified`).
