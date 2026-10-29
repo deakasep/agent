@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api, type Me, type Membership } from "./auth";
 
 export type Page<T> = { items: T[]; total: number; limit: number; offset: number };
-export type Client = { client_code: string; vertical: string; business_type: string; location_area: string | null; approver_role: string; simulation: boolean };
+export type Client = { client_code: string; vertical: string; business_type: string; location_area: string | null; approver_role: string; simulation: boolean; self_serve?: boolean };
 export type WfRequest = {
   id: number; client_code: string; intent: string; pillar: number; agent: string | null; approval_min: string; text: string;
   deadline: string | null; impact: number; risk: number; priority: string; priority_score: number; status: string;
@@ -93,6 +93,21 @@ export function memberFor(me: Me, client: string): Membership | undefined {
 
 export function roleFor(me: Me, client: string): string {
   return memberFor(me, client)?.role ?? "";
+}
+
+/** Pemilik usaha langganan mandiri (kontrak 0.13.0): approver klien `self_serve` itu. Sama dengan backend. */
+export function isSelfServeOwner(me: Me, client: Client | undefined): boolean {
+  return !!client?.self_serve && roleFor(me, client.client_code) === "client_approver";
+}
+
+/** Daftar klien yang terlihat user (dimuat sekali setelah sesi siap). */
+export function useClients(ready: boolean): Client[] {
+  const [clients, setClients] = useState<Client[]>([]);
+  useEffect(() => {
+    if (!ready) return;
+    api<{ items: Client[] }>("clients").then((r) => r.ok && setClients(r.data.items));
+  }, [ready]);
+  return clients;
 }
 
 /** Link hanya untuk https/mailto; workspace:// (arsip internal) ditampilkan sebagai teks. */

@@ -23,7 +23,10 @@ from app.billing.ledger import charge
 from app.db.models import AI_JOB_STATUSES, CLIENT_CODE_RE, AiBudget, AiCall, AiJob, Client, Request
 from app.errors import ApiError
 from app.registry import agent_for_intent
-from app.workflow import AGENCY_WRITERS, Body, Page, audit, check_list_scope, forbidden, iso, not_found, page, paged, role_for, visible_request
+from app.workflow import (
+    AGENCY_WRITERS, Body, Page, audit, check_list_scope, forbidden, is_self_serve_owner, iso, not_found, page, paged, role_for,
+    visible_request,
+)
 
 router = APIRouter()
 MONTH_RE = r"^\d{4}-(0[1-9]|1[0-2])$"
@@ -57,8 +60,8 @@ def create_ai_draft(request_id: int, ctx: AuthContext = Depends(current_user), d
     if not settings.enabled:
         raise ApiError(409, "ai_disabled", "Fitur AI sedang dimatikan owner.")
     req = visible_request(db, ctx, request_id, lock=True)
-    if role_for(ctx, req.client_code) not in AGENCY_WRITERS:
-        raise forbidden("Hanya staf agency yang meminta draft AI.")
+    if role_for(ctx, req.client_code) not in AGENCY_WRITERS and not is_self_serve_owner(db, ctx, req.client_code):
+        raise forbidden("Hanya staf agency atau pemilik usaha langganan mandiri yang meminta draft AI.")
     if req.status not in ("open", "in_progress"):
         raise ApiError(409, "request_closed", "Request sudah selesai; buat request baru.")
     agent = agent_for_intent(req.intent)
@@ -135,8 +138,8 @@ def get_ai_job(job_id: int, ctx: AuthContext = Depends(current_user), db: Sessio
 @router.post("/ai-jobs/{job_id}/cancel")
 def cancel_ai_job(job_id: int, ctx: AuthContext = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     job, code = visible_job(db, ctx, job_id, lock=True)
-    if role_for(ctx, code) not in AGENCY_WRITERS:
-        raise forbidden("Hanya staf agency yang membatalkan job AI.")
+    if role_for(ctx, code) not in AGENCY_WRITERS and not is_self_serve_owner(db, ctx, code):
+        raise forbidden("Hanya staf agency atau pemilik usaha langganan mandiri yang membatalkan job AI.")
     if job.status != "queued":
         raise ApiError(409, "ai_job_not_cancellable", "Job sudah berjalan atau selesai; tidak bisa dibatalkan.")
     job.status, job.error_code, job.finished_at = "cancelled", "cancelled_by_user", datetime.now(timezone.utc)

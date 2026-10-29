@@ -167,6 +167,15 @@ def role_for(ctx: AuthContext, client_code: str) -> str | None:
     return m.role if m else None
 
 
+def is_self_serve_owner(db: Session, ctx: AuthContext, client_code: str) -> bool:
+    """Pemilik usaha langganan mandiri (migrasi 0010): `client_approver` klien `self_serve` itu. Boleh meminta draft
+    AI, mengisi Brain bisnis sendiri, dan menyetujui hasil agen (AI-CONSTITUTION v4.0.0 §11)."""
+    if role_for(ctx, client_code) != "client_approver":
+        return False
+    client = db.get(Client, client_code)
+    return bool(client and client.self_serve)
+
+
 def forbidden(message: str = "Peranmu tidak boleh melakukan ini.") -> ApiError:
     return ApiError(403, "forbidden", message)
 

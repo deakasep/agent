@@ -15,9 +15,10 @@ const POLL_MS = 3000;
  * memeriksa status tiap 3 detik selama job antre/berjalan, lalu memuat ulang draft saat selesai.
  * Hasil AI selalu draft: tetap direview manusia dan disetujui klien. Tidak ada publish.
  */
-export default function AiPanel({ requestId, canAsk, onJobs, onDraft }: {
+export default function AiPanel({ requestId, canAsk, selfServe = false, onJobs, onDraft }: {
   requestId: number;
   canAsk: boolean;
+  selfServe?: boolean;
   onJobs: (jobs: AiJob[]) => void;
   onDraft: () => void;
 }) {
@@ -92,10 +93,17 @@ export default function AiPanel({ requestId, canAsk, onJobs, onDraft }: {
       )}
       <Notice msg={msg} />
       <p className="muted wf-hint">
+        {selfServe ? (
+          <L
+            en="The agent only uses facts from your business Brain and checks every claim against them. Claims without a fact are marked RISK and lock approval. Each draft uses the credits shown on the Credits page; failed jobs give credits back."
+            id="Agen hanya memakai fakta dari Brain bisnis kamu dan mengecek setiap klaim ke fakta itu. Klaim tanpa fakta ditandai RISK dan mengunci persetujuan. Setiap draft memakai kredit sesuai halaman Kredit; job gagal = kredit kembali."
+          />
+        ) : (
         <L
           en="The AI only uses facts the client approved, and checks every claim against them. Claims without a fact are marked RISK and lock approval. You and an independent reviewer still read the whole draft, and the person who asked the AI can't approve it."
           id="AI hanya memakai fakta yang disetujui klien dan mengecek setiap klaim ke fakta itu. Klaim tanpa fakta ditandai RISK dan mengunci approval. Seluruh draft tetap dibaca kamu dan reviewer independen, dan orang yang meminta AI tidak bisa meng-approve-nya."
         />
+        )}
       </p>
     </Card>
   );

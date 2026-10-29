@@ -171,7 +171,7 @@ Sumber aturan: core AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0 § Token Kana
 | Kredit bulanan | 500 per periode bulan langganan, diberikan saat saldo dibaca/dipakai (tanpa cron); sisa periode lalu hangus (`monthly_expire`) |
 | Pemakaian | `POST /requests/{id}/ai-drafts` memotong tarif intent (bulanan dulu, lalu top up) di transaksi yang sama dengan job; kurang = 402 `credits_insufficient`. Job `failed`/`cancelled` → refund otomatis (trigger `trg_ai_jobs_refund`). Klien SIMULASI gratis |
 | Bayar | `CLAU_PAYMENT_PROVIDER=fake` (mode uji; owner melunasi lewat `simulate-paid`, ditolak bila `CLAU_ENV=production`) atau `midtrans` (Snap; lunas hanya dari webhook `POST /billing/webhooks/midtrans` dengan tanda tangan SHA512 + cek nominal, idempoten). Server key hanya di `.env` server |
-| Belum | Pendaftaran klien mandiri (sekarang owner membuat akun & klien), kedaluwarsa kredit top up 12 bulan (tanggal dicatat, belum ditegakkan), posting ke kanal setelah approve (OAuth Meta/TikTok) |
+| Belum | Kedaluwarsa kredit top up 12 bulan (tanggal dicatat, belum ditegakkan), posting ke kanal setelah approve (OAuth Meta/TikTok) |
 
 ## Pendaftaran Mandiri (0.12.0, TASK-003)
 
@@ -188,6 +188,18 @@ Sumber aturan: core AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0 § Token Kana
 - Lokal: `CLAU_MAIL_BACKEND=file CLAU_MAIL_DIR=./mail-dev` menulis email `.eml` ke folder (ditolak di produksi).
 - Respons daftar, kirim ulang, dan lupa password sama untuk email terdaftar maupun tidak; batas 3/jam per email dan `CLAU_SIGNUP_MAX_PER_HOUR` (default 30) total. Tambah juga `limit_req` Nginx per IP untuk `/api/auth/` saat deploy.
 - Akun daftar mandiri baru bisa login setelah email terverifikasi (403 `email_not_verified`).
+
+## Klien Mandiri Memakai Agen Sendiri (0.13.0, TASK-007)
+
+Migrasi 0010: `clients.self_serve` (diisi `true` oleh `/auth/signup`). Untuk klien `self_serve`, `client_approver` klien itu = pemilik usaha (AI-CONSTITUTION v4.0.0 §11):
+
+| Hak | Endpoint | Catatan |
+|---|---|---|
+| Brain bisnis | `POST /fact-sheets` | `document_ref` boleh kosong (`workspace://brain/<klien>/v<n>`). Fakta langsung dikonfirmasi & disetujui oleh pemilik usaha di transaksi yang sama |
+| Minta / batalkan draft AI | `POST /requests/{id}/ai-drafts`, `POST /ai-jobs/{id}/cancel` | Kredit dipotong seperti biasa |
+| Setujui hasil agen | `POST /approvals` | L2/L3 tanpa claim verification independen agency; peminta draft AI boleh memutuskan. Fakta tetap wajib dari Brain yang disetujui (`facts_unconfirmed`), level minimum & versi terbaru tetap berlaku |
+
+Klien terkelola (`self_serve = false`) dan peran agency tidak berubah. Pengecualian ada di trigger database (bukan hanya API), jadi menandai klien `self_serve = false` langsung mengembalikan aturan lama.
 
 ## Belum Ada (Planned)
 

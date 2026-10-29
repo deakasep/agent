@@ -116,6 +116,8 @@ class Client(Base):
     approver_role: Mapped[str] = mapped_column(Text, nullable=False)
     # Klien fiktif (pilot SIMULASI): semua draft-nya otomatis mode SIMULASI, tidak pernah bisa Approved.
     simulation: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+    # Klien langganan mandiri (migrasi 0010): approver klien = pemilik usaha; persetujuannya = review manusia (§11).
+    self_serve: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
     created_at: Mapped[datetime] = created_at()
     __table_args__ = (
         CheckConstraint(f"client_code ~ '{CLIENT_CODE_RE}'", name="client_code_format"),

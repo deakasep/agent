@@ -46,6 +46,7 @@ from app.workflow import (
     audit,
     check_list_scope,
     forbidden,
+    is_self_serve_owner,
     iso,
     not_found,
     page,
@@ -94,7 +95,8 @@ class FactIn(Body):
 
 class FactSheetIn(Body):
     client_code: str = Field(pattern=CLIENT_CODE_RE)
-    document_ref: str = Field(max_length=500, pattern=REF_RE)
+    # Wajib untuk agency (dokumen sumber). Pemilik usaha mandiri mengisi Brain di dashboard: boleh kosong (0.13.0).
+    document_ref: str | None = Field(default=None, max_length=500, pattern=REF_RE)
     facts: list[FactIn] = Field(min_length=1, max_length=100)
 
     @model_validator(mode="after")
@@ -131,7 +133,7 @@ class ApproveIn(Body):
 def client_json(c: Client) -> dict:
     return {"client_code": c.client_code, "vertical": c.vertical, "business_type": c.business_type,
             "location_area": c.location_area, "approver_role": c.approver_role, "simulation": c.simulation,
-            "created_at": iso(c.created_at)}
+            "self_serve": c.self_serve, "created_at": iso(c.created_at)}
 
 
 def confirmation_json(c: FactConfirmation) -> dict:
@@ -219,18 +221,34 @@ def create_client(body: ClientIn, ctx: AuthContext = Depends(require_owner), db:
 
 @router.post("/fact-sheets", status_code=201)
 def create_fact_sheet(body: FactSheetIn, ctx: AuthContext = Depends(current_user), db: Session = Depends(get_db)) -> dict:
-    if role_for(ctx, body.client_code) not in AGENCY_WRITERS:
-        raise forbidden("Hanya staf agency yang menyusun fact sheet.")
+    owner = is_self_serve_owner(db, ctx, body.client_code)
+    if role_for(ctx, body.client_code) not in AGENCY_WRITERS and not owner:
+        raise forbidden("Hanya staf agency atau pemilik usaha langganan mandiri yang menyusun fact sheet.")
+    if body.document_ref is None and not owner:
+        raise ApiError(422, "document_ref_required", "Fact sheet dari agency wajib menyebut dokumen sumbernya (document_ref).")
     # Klien dikunci: versi berikutnya tidak bisa balapan (trigger juga mengunci).
     if db.scalar(select(Client).where(Client.client_code == body.client_code).with_for_update(key_share=True)) is None:
         raise ApiError(404, "client_not_found", "Klien tidak dikenal.")
     version = (db.scalar(select(func.max(FactSheet.version)).where(FactSheet.client_code == body.client_code)) or 0) + 1
-    sheet = FactSheet(client_code=body.client_code, version=version, document_ref=body.document_ref, created_by=ctx.user.id)
+    document_ref = body.document_ref or f"workspace://brain/{body.client_code}/v{version}"
+    sheet = FactSheet(client_code=body.client_code, version=version, document_ref=document_ref, created_by=ctx.user.id)
     db.add(sheet)
     db.flush()
     db.add_all(Fact(fact_sheet_id=sheet.id, **f.model_dump()) for f in body.facts)
     db.flush()
     audit(db, ctx, "fact_sheet.create", "fact_sheet", sheet.id, client_code=sheet.client_code, version=version, facts=len(body.facts))
+    if owner:
+        # Brain bisnis langganan mandiri (0.13.0): fakta yang ditulis pemilik usaha = jawaban klien. Dikonfirmasi dan
+        # disetujui sekaligus oleh dia sendiri (trigger migrasi 0010 mengizinkannya hanya untuk klien self_serve).
+        db.add_all(FactConfirmation(fact_sheet_id=sheet.id, fact_key=f.fact_key, decision="confirmed",
+                                    confirmed_by=ctx.user.id, confirmed_by_role="client_approver") for f in body.facts)
+        db.flush()
+        sheet.approved_at = datetime.now(timezone.utc)
+        sheet.approved_by = ctx.user.id
+        sheet.approved_by_role = "client_approver"
+        db.flush()
+        audit(db, ctx, "fact_sheet.approve", "fact_sheet", sheet.id, client_code=sheet.client_code, version=version,
+              written_evidence=False, scope=sheet.client_code, self_serve=True)
     db.commit()
     return sheet_detail(db, sheet)
 
