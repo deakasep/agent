@@ -1,5 +1,5 @@
 {
-  "registry_version": "0.5.0",
+  "registry_version": "0.6.0",
   "router_source": "core/orchestrator/router.md",
   "default_forbidden_actions": [
     "publish",
@@ -234,6 +234,50 @@
       }
     },
     {
+      "id": "image-creator",
+      "display_name": "Nova",
+      "pillar": 1,
+      "status": "planned",
+      "intents": [
+        "image"
+      ],
+      "skill": null,
+      "prompt": null,
+      "template": null,
+      "skill_repo": null,
+      "approval_min": "L2",
+      "autonomy_max": "B",
+      "persona": "agents/personas/image-creator.md",
+      "evals": "agents/evals/cases/image-creator.json",
+      "avatar": {
+        "crop": "frontend/public/agents/image-creator.webp",
+        "master": "agents/avatars/image-creator.webp",
+        "figure": "female"
+      }
+    },
+    {
+      "id": "video-creator",
+      "display_name": "Aruna",
+      "pillar": 1,
+      "status": "planned",
+      "intents": [
+        "video"
+      ],
+      "skill": null,
+      "prompt": null,
+      "template": null,
+      "skill_repo": null,
+      "approval_min": "L2",
+      "autonomy_max": "B",
+      "persona": "agents/personas/video-creator.md",
+      "evals": "agents/evals/cases/video-creator.json",
+      "avatar": {
+        "crop": "frontend/public/agents/video-creator.webp",
+        "master": "agents/avatars/video-creator.webp",
+        "figure": "female"
+      }
+    },
+    {
       "id": "report-builder",
       "display_name": "Intan",
       "pillar": 4,
@@ -252,6 +296,29 @@
       "avatar": {
         "crop": "frontend/public/agents/report-builder.webp",
         "master": "agents/avatars/report-builder.webp",
+        "figure": "female"
+      }
+    },
+    {
+      "id": "data-analyst",
+      "display_name": "Dara",
+      "pillar": 4,
+      "status": "planned",
+      "intents": [
+        "data-analysis",
+        "data-annotation"
+      ],
+      "skill": null,
+      "prompt": null,
+      "template": null,
+      "skill_repo": null,
+      "approval_min": "L1",
+      "autonomy_max": "B",
+      "persona": "agents/personas/data-analyst.md",
+      "evals": "agents/evals/cases/data-analyst.json",
+      "avatar": {
+        "crop": "frontend/public/agents/data-analyst.webp",
+        "master": "agents/avatars/data-analyst.webp",
         "figure": "female"
       }
     },
@@ -305,7 +372,9 @@
       "pillar": 3,
       "status": "planned",
       "intents": [
-        "sop"
+        "sop",
+        "integration",
+        "web-dev"
       ],
       "skill": null,
       "prompt": null,

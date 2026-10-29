@@ -81,7 +81,7 @@ npm run build
 
 - Nama produk: **CLAU AI** (wordmark "CLAU AI" + deskriptor modul "Content Studio"; opsi B, keputusan owner 2026-10-09, clau-content#46).
 - Palet UI produk v2: navy + deep teal + putih + slate (token di `app/globals.css`). Dicatat di `clau-content/design/brand/brand-guideline.md` §3b.
-- Nama agent (Tara, Raka, Sekar, Bayu, Laras, Dimas, Ayu, Nara, Intan, Galih, Sari, Teguh) disetujui. Sumber nama: `agents/registry.json` (`display_name`). 2026-10-08: nama report-builder dan sales-assistant ditukar (Intan ↔ Galih) agar sesuai figur 3D.
+- Nama agent (Tara, Raka, Sekar, Bayu, Laras, Dimas, Ayu, Nara, Intan, Galih, Sari, Teguh; Nova, Aruna, Dara sejak 2026-10-29) disetujui. Sumber nama: `agents/registry.json` (`display_name`). 2026-10-08: nama report-builder dan sales-assistant ditukar (Intan ↔ Galih) agar sesuai figur 3D.
 
 ## Batas
 
