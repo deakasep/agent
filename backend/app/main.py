@@ -1,7 +1,7 @@
 """CLAU AI agents backend.
 
 Registry & router statis dari clau-core, login & user (app/auth), dan workflow request → draft → QA →
-approval (app/workflow), serta klien, fact sheet & konfirmasi fakta (app/facts). Sengaja tidak ada endpoint yang mem-publish konten, mengirim pesan ke tamu, atau
+approval (app/workflow), serta klien, fact sheet & konfirmasi fakta (app/facts), dan langganan & kredit (app/billing). Sengaja tidak ada endpoint yang mem-publish konten, mengirim pesan ke tamu, atau
 mengubah sistem client (core/AI-CONSTITUTION.md §4).
 """
 
@@ -19,12 +19,13 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.ai.routes import router as ai_router
 from app.auth.routes import router as auth_router
+from app.billing.routes import router as billing_router
 from app.errors import ApiError, db_rule_code, error_body
 from app.facts import router as facts_router
 from app.registry import load_registry
 from app.workflow import router as workflow_router
 
-__version__ = "0.10.0"
+__version__ = "0.11.0"
 
 # Pengamanan (docs/security.md §3). Semua bisa diatur lewat environment di server, tanpa ubah kode.
 CLAU_ENV = os.environ.get("CLAU_ENV") or "development"
@@ -170,3 +171,4 @@ app.include_router(auth_router)
 app.include_router(workflow_router)
 app.include_router(facts_router)
 app.include_router(ai_router)
+app.include_router(billing_router)

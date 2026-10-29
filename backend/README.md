@@ -161,6 +161,18 @@ UI (PR 4d): tombol *Buat draft dengan AI* di `/requests/[id]` dan halaman owner 
 
 Test: `tests/test_ai.py` (termasuk regresi audit 2026-10-16: alur SIMULASI utuh, contoh "private beach" ditandai dan mengunci approval sampai versi tanpa klaim itu, prompt hanya fakta terbaru yang dikonfirmasi + penyamaran, penjaga endpoint, peran & isolasi klien, retry/tolak/request ditutup/worker mati, dua worker tidak mengambil job yang sama, tombol mati, aturan database 0006, batas biaya) dan `tests/compose_ai_smoke.py` (CI job `docker`: container backend → database → container worker).
 
+## Langganan & Kredit (0.11.0, model langganan)
+
+Sumber aturan: core AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0 § Token Kanal & Pembayaran, api-contracts 0.11.0. Harga & tarif: `app/billing/catalog.py` = `clau-market/commercial/pricing.md` (dites `tests/test_billing.py`).
+
+| Bagian | Isi |
+|---|---|
+| Tabel (migrasi 0008) | `payments` (tagihan; transisi pending → paid/expired/failed, beku setelah selesai), `subscriptions` (paket lunas; perpanjangan dimulai saat paket lama habis), `credit_ledger` (append-only; saldo = jumlah delta per bucket `monthly`/`topup`) |
+| Kredit bulanan | 500 per periode bulan langganan, diberikan saat saldo dibaca/dipakai (tanpa cron); sisa periode lalu hangus (`monthly_expire`) |
+| Pemakaian | `POST /requests/{id}/ai-drafts` memotong tarif intent (bulanan dulu, lalu top up) di transaksi yang sama dengan job; kurang = 402 `credits_insufficient`. Job `failed`/`cancelled` → refund otomatis (trigger `trg_ai_jobs_refund`). Klien SIMULASI gratis |
+| Bayar | `CLAU_PAYMENT_PROVIDER=fake` (mode uji; owner melunasi lewat `simulate-paid`, ditolak bila `CLAU_ENV=production`) atau `midtrans` (Snap; lunas hanya dari webhook `POST /billing/webhooks/midtrans` dengan tanda tangan SHA512 + cek nominal, idempoten). Server key hanya di `.env` server |
+| Belum | Pendaftaran klien mandiri (sekarang owner membuat akun & klien), kedaluwarsa kredit top up 12 bulan (tanggal dicatat, belum ditegakkan), posting ke kanal setelah approve (OAuth Meta/TikTok) |
+
 ## Belum Ada (Planned)
 
 Provider AI nyata (PR 4c), notifikasi ke klien, Portal Klien terpisah.

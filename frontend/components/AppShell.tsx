@@ -46,6 +46,7 @@ export default function AppShell({ children, activeAgents }: { children: ReactNo
         { href: "/account", en: "Account", id: "Akun", icon: "user" },
         { href: "/users", en: "Users", id: "Pengguna", icon: "users" },
         { href: "/ai-usage", en: "AI usage", id: "Pemakaian AI", icon: "sparkles" },
+        { href: "/billing", en: "Credits & plan", id: "Kredit & paket", icon: "reports" },
       ],
     },
   ];

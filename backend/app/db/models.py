@@ -574,3 +574,94 @@ class AiBudget(Base):
         CheckConstraint("limit_micro_usd > 0 AND limit_micro_usd <= 100000000000", name="limit_range"),
         CheckConstraint("alert_at_pct BETWEEN 1 AND 100", name="alert_range"),
     )
+
+
+# --- Langganan & kredit (migrasi 0008, kontrak core 0.11.0, AI-CONSTITUTION v4.0.0 §4b) -------------------------
+PAYMENT_KINDS = ("subscription", "topup")
+PAYMENT_STATUSES = ("pending", "paid", "expired", "failed")
+PAYMENT_PROVIDERS = ("fake", "midtrans")
+PLAN_MONTHS = (1, 3, 6, 12)
+CREDIT_BUCKETS = ("monthly", "topup")
+CREDIT_REASONS = ("monthly_grant", "monthly_expire", "topup", "usage", "refund", "adjustment")
+
+
+class Payment(Base):
+    """Tagihan paket / top up. Nominal dari katalog server; status lunas hanya dari webhook terverifikasi atau simulasi
+    provider `fake`. Transisi & kolom identitas dijaga trigger (migrasi 0008). Tanpa data kartu/rekening."""
+
+    __tablename__ = "payments"
+    id: Mapped[int] = pk()
+    client_code: Mapped[str] = mapped_column(ForeignKey("clients.client_code"), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(Text, nullable=False)
+    plan_months: Mapped[int | None] = mapped_column(SmallInteger)
+    credits: Mapped[int | None] = mapped_column(Integer)
+    amount_idr: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    provider: Mapped[str] = mapped_column(Text, nullable=False)
+    order_id: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    status: Mapped[str] = mapped_column(Text, nullable=False, server_default="pending")
+    method: Mapped[str | None] = mapped_column(Text)
+    requested_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    created_at: Mapped[datetime] = created_at()
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    __table_args__ = (
+        CheckConstraint(one_of("kind", PAYMENT_KINDS), name="kind"),
+        CheckConstraint(one_of("status", PAYMENT_STATUSES), name="status"),
+        CheckConstraint(one_of("provider", PAYMENT_PROVIDERS), name="provider"),
+        CheckConstraint(
+            "(kind = 'subscription' AND plan_months IN (1, 3, 6, 12) AND credits IS NULL)"
+            " OR (kind = 'topup' AND plan_months IS NULL AND credits BETWEEN 1 AND 1000000)",
+            name="kind_fields",
+        ),
+        CheckConstraint("amount_idr BETWEEN 1000 AND 1000000000", name="amount_range"),
+        CheckConstraint("(status = 'paid') = (paid_at IS NOT NULL)", name="paid_at"),
+        CheckConstraint("order_id ~ '^CLAU-[A-Z0-9]{2,12}-[0-9]+-[a-z0-9]{6,16}$'", name="order_id_format"),
+        CheckConstraint("method IS NULL OR char_length(method) <= 40", name="method_length"),
+    )
+
+
+class Subscription(Base):
+    """Paket yang sudah lunas (satu per pembayaran). Append-only; perpanjangan dimulai saat paket sebelumnya habis."""
+
+    __tablename__ = "subscriptions"
+    id: Mapped[int] = pk()
+    client_code: Mapped[str] = mapped_column(ForeignKey("clients.client_code"), nullable=False, index=True)
+    payment_id: Mapped[int] = mapped_column(ForeignKey("payments.id"), nullable=False, unique=True)
+    plan_months: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = created_at()
+    __table_args__ = (
+        CheckConstraint("plan_months IN (1, 3, 6, 12)", name="plan_months"),
+        CheckConstraint("ends_at > starts_at", name="period"),
+    )
+
+
+class CreditEntry(Base):
+    """Buku kredit append-only. Saldo = jumlah delta per bucket; aturan per reason, saldo tidak negatif, dan tidak ada
+    hibah/refund ganda ditegakkan trigger + indeks unik (migrasi 0008)."""
+
+    __tablename__ = "credit_ledger"
+    id: Mapped[int] = pk()
+    client_code: Mapped[str] = mapped_column(ForeignKey("clients.client_code"), nullable=False, index=True)
+    delta: Mapped[int] = mapped_column(Integer, nullable=False)
+    bucket: Mapped[str] = mapped_column(Text, nullable=False)
+    reason: Mapped[str] = mapped_column(Text, nullable=False)
+    subscription_id: Mapped[int | None] = mapped_column(ForeignKey("subscriptions.id"))
+    period_start: Mapped[date | None] = mapped_column(Date)
+    payment_id: Mapped[int | None] = mapped_column(ForeignKey("payments.id"))
+    ai_job_id: Mapped[int | None] = mapped_column(ForeignKey("ai_jobs.id"))
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    note: Mapped[str | None] = mapped_column(Text)
+    created_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = created_at()
+    __table_args__ = (
+        CheckConstraint(one_of("bucket", CREDIT_BUCKETS), name="bucket"),
+        CheckConstraint(one_of("reason", CREDIT_REASONS), name="reason"),
+        CheckConstraint("delta <> 0 AND delta BETWEEN -1000000 AND 1000000", name="delta_range"),
+        CheckConstraint("note IS NULL OR char_length(note) BETWEEN 3 AND 300", name="note_length"),
+        Index("uq_credit_ledger_monthly", "subscription_id", "period_start", "reason", unique=True,
+              postgresql_where=text("reason IN ('monthly_grant', 'monthly_expire')")),
+        Index("uq_credit_ledger_topup", "payment_id", unique=True, postgresql_where=text("reason = 'topup'")),
+        Index("uq_credit_ledger_job", "ai_job_id", "bucket", "reason", unique=True, postgresql_where=text("ai_job_id IS NOT NULL")),
+        Index("ix_credit_ledger_created_at", "created_at"),
+    )

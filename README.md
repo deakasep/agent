@@ -2,7 +2,7 @@
 
 **Platform CLAU AI**: tempat agent menjalankan skill dari repo pilar untuk bisnis hospitality Indonesia. Repo ini berisi kode (frontend Next.js, backend FastAPI) dan **registry agent**. Aturan isi konten tidak ditulis di sini; aturan ada di [clau-core](https://github.com/deakasep/core) (submodule `core/`) dan repo pilar.
 
-> **Status:** Public, hanya untuk dilihat ([LICENSE](./LICENSE)). Backend v0.10.0: PostgreSQL 16 (migrasi 0001–0007, termasuk level approval otomatis dari isi konten), login + 2FA wajib owner & content lead (QR & kode cadangan) + `/users`, backup terenkripsi tiap 6 jam + Backblaze B2, workflow request → draft → QA → approval dan fact sheet + Konfirmasi Fakta oleh klien (aturan Rule 08 dicek server & database), antrean AI menulis draft dengan AI fact-check & batas biaya (provider tiruan; provider Claude menyusul), dengan halaman UI-nya (`/requests`, `/fact-sheets`, `/ai-usage`). Status kerja terkini: [status & handoff](https://github.com/deakasep/content/blob/main/docs/status.md).
+> **Status:** Public, hanya untuk dilihat ([LICENSE](./LICENSE)). Backend v0.11.0: langganan & kredit (migrasi 0008, `/billing`), PostgreSQL 16 (migrasi 0001–0008, termasuk level approval otomatis dari isi konten), login + 2FA wajib owner & content lead (QR & kode cadangan) + `/users`, backup terenkripsi tiap 6 jam + Backblaze B2, workflow request → draft → QA → approval dan fact sheet + Konfirmasi Fakta oleh klien (aturan Rule 08 dicek server & database), antrean AI menulis draft dengan AI fact-check & batas biaya (provider tiruan; provider Claude menyusul), dengan halaman UI-nya (`/requests`, `/fact-sheets`, `/ai-usage`). Status kerja terkini: [status & handoff](https://github.com/deakasep/content/blob/main/docs/status.md).
 
 ## Prinsip Platform
 
