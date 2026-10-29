@@ -11,13 +11,13 @@
 | `run_evals.py` | Runner (Python stdlib) |
 | `../personas/<agent-id>.md` | Kartu persona yang menjadi acuan gaya |
 
-Saat ini: **12 agent, 33 kasus** (termasuk kasus vertical fokus wedding, travel, cafe), termasuk kasus sulit: review tuduhan keracunan, prompt injection di review, permintaan voice clone, footage tanpa consent, campaign hari suci, permintaan diskon khusus, tamu cedera, dan pencampuran bahan kimia.
+Saat ini: **15 agent, 40 kasus** (termasuk kasus vertical fokus wedding, travel, cafe), termasuk kasus sulit: review tuduhan keracunan, prompt injection di review, permintaan voice clone, footage tanpa consent, campaign hari suci, permintaan diskon khusus, tamu cedera, dan pencampuran bahan kimia.
 
 ## 2. Lapis 1 — Cek Deterministik (otomatis)
 
 ```bash
 python agents/evals/run_evals.py --check
-# PASS — 12 agents, 33 cases; every GOOD reference passes and every BAD reference is caught
+# PASS — 15 agents, 40 cases; every GOOD reference passes and every BAD reference is caught
 
 python agents/evals/run_evals.py --agent review-responder --outputs my-outputs.json
 # my-outputs.json = {"rr-01": "<output agent>", "rr-02": "...", ...}

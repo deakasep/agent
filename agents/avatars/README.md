@@ -1,13 +1,13 @@
 # Avatar 3D Agent
 
-Figur 3D (gaya figurine chibi, latar mint `#DDF4EE`) untuk 12 agent di `registry.json`. Dibuat dengan image generator dari paket prompt CLAU, dikirim owner pada 2026-10-08.
+Figur 3D (gaya figurine chibi, latar mint `#DDF4EE`) untuk 15 agent di `registry.json`. Dibuat dengan image generator dari paket prompt CLAU, dikirim owner pada 2026-10-08.
 
 | Lokasi | Isi |
 |---|---|
 | `agents/avatars/<id>.webp` | Master 1248×832 (seluruh badan) |
 | `frontend/public/agents/<id>.webp` | Crop kepala & bahu 256×256, dipakai komponen `Avatar` |
 
-Agent konsep (belum ada di registry) memakai `concept-<nama>.webp` (Nova, Aruna, Dara; ditambahkan 2026-10-08). Konsep tanpa gambar jatuh ke karakter SVG (`frontend/components/Character.tsx`).
+Agent konsep (belum ada di registry) memakai `concept-<nama>.webp`; konsep tanpa gambar jatuh ke karakter SVG (`frontend/components/Character.tsx`). Nova, Aruna, Dara (konsep sejak 2026-10-08) dipromosikan 2026-10-29 menjadi `image-creator`, `video-creator`, `data-analyst` (file di-rename, gambar sama).
 
 ## Aturan
 
@@ -24,7 +24,7 @@ Agent konsep (belum ada di registry) memakai `concept-<nama>.webp` (Nova, Aruna,
 |---|---|---|
 | caption-writer, reel-scripter, story-writer, listing-writer, review-responder, calendar-planner, campaign-planner, localizer, sales-assistant | `ASSUMPTION` | Diterima di sesi 2026-10-08; menunggu konfirmasi Pak Indra / Dea Karisna saat review PR |
 | report-builder | `ASSUMPTION` | Nama ditukar Galih → Intan (2026-10-08) agar sesuai figur; opsional: generate ulang menghadap depan |
-| concept-nova, concept-aruna, concept-dara | `ASSUMPTION` | Agent konsep; belum ada persona/eval |
+| image-creator, video-creator, data-analyst | `ASSUMPTION` | Dulu concept-nova/aruna/dara; dipromosikan 2026-10-29 (planned, persona & eval ada) |
 | guest-messenger, sop-writer | `ASSUMPTION` | Diganti 2026-10-08: layar HP tanpa teks (Sari), proporsi chibi diseragamkan (Teguh) |
 
 Prompt dasar yang dipakai:

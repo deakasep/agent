@@ -40,6 +40,7 @@ MIN_CASES = {"active": 2, "planned": 2}
 # Agents whose work regularly hits hard limits must prove they escalate instead of answering.
 REQUIRES_ESCALATION_CASE = {
     "reel-scripter", "review-responder", "campaign-planner", "sales-assistant", "guest-messenger", "sop-writer",
+    "image-creator", "video-creator", "data-analyst",
 }
 
 

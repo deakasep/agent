@@ -136,6 +136,30 @@ const PROFILES: Record<string, Omit<Member, keyof Agent | "name" | "uniform" | "
     hue: "#155E75",
     look: { skin: SKIN.tan, hair: HAIR.dark, hairStyle: "short", headwear: "glasses", prop: "chart" },
   },
+  "image-creator": {
+    role: t("AI Image Creator", "AI Image Creator"),
+    headline: t("Your visual content specialist.", "Spesialis visual konten kamu."),
+    tagline: t("Turns your offer into on-brand promo images, banners and feed visuals.", "Mengubah penawaran kamu jadi gambar promo, banner, dan visual feed sesuai warna merek."),
+    capabilities: [t("Promo images", "Gambar promo"), t("Banners", "Banner"), t("Brand colours", "Warna merek")],
+    hue: "#64748B",
+    look: { skin: SKIN.light, hair: HAIR.brown, hairStyle: "bob", headwear: "glasses", prop: "tablet" },
+  },
+  "video-creator": {
+    role: t("AI Video Creator", "AI Video Creator"),
+    headline: t("Your short AI video specialist.", "Spesialis video AI pendek kamu."),
+    tagline: t("Storyboards and generates short 9:16 clips with a 3-second hook.", "Menyusun storyboard dan membuat klip pendek 9:16 dengan hook 3 detik."),
+    capabilities: [t("Storyboards", "Storyboard"), t("AI video", "Video AI"), t("On-screen text", "Teks layar")],
+    hue: "#64748B",
+    look: { skin: SKIN.tan, hair: HAIR.black, hairStyle: "long", headwear: "beret", prop: "clapper" },
+  },
+  "data-analyst": {
+    role: t("AI Data Analyst & Annotator", "AI Data Analyst & Annotator"),
+    headline: t("Your data specialist.", "Spesialis data kamu."),
+    tagline: t("Summarises sales and stock files honestly and labels data with clear rules.", "Merangkum file penjualan dan stok apa adanya, serta melabeli data dengan aturan yang jelas."),
+    capabilities: [t("Sales insight", "Insight penjualan"), t("Data labelling", "Label data"), t("Data quality flags", "Penanda data bermasalah")],
+    hue: "#64748B",
+    look: { skin: SKIN.brown, hair: HAIR.dark, hairStyle: "bun", headwear: "none", prop: "chart" },
+  },
   "sales-assistant": {
     role: t("AI Reservations Assistant", "AI Reservations Assistant"),
     headline: t("Your inquiry specialist.", "Spesialis inquiry kamu."),
@@ -153,20 +177,17 @@ const PROFILES: Record<string, Omit<Member, keyof Agent | "name" | "uniform" | "
     look: { skin: SKIN.brown, hair: "#9A3412", hairStyle: "hijab", headwear: "none", prop: "bell" },
   },
   "sop-writer": {
-    role: t("AI SOP Specialist", "AI SOP Specialist"),
-    headline: t("Your operations documentation specialist.", "Spesialis dokumentasi operasional kamu."),
-    tagline: t("Writes step-by-step SOPs and checklists every staff member can follow.", "Menulis SOP langkah demi langkah dan checklist yang mudah diikuti semua staf."),
-    capabilities: [t("SOPs", "SOP"), t("Checklists", "Checklist"), t("Safety standards", "Standar keselamatan")],
+    role: t("AI Ops & Integration Specialist", "AI Ops & Integration Specialist"),
+    headline: t("Your operations and integration specialist.", "Spesialis operasional dan integrasi kamu."),
+    tagline: t("Writes SOPs, plans integrations (Sheets, WhatsApp, online store) and simple pages or automations.", "Menulis SOP, merancang integrasi (Sheets, WhatsApp, toko online), serta halaman atau automasi sederhana."),
+    capabilities: [t("SOPs", "SOP"), t("Integrations", "Integrasi"), t("Simple web pages", "Halaman web sederhana")],
     hue: "#64748B",
     look: { skin: SKIN.deep, hair: HAIR.black, hairStyle: "swoop", headwear: "none", prop: "clipboard" },
   },
 };
 
-export const CONCEPT_AGENTS: ConceptAgent[] = [
-  { name: "Nova", role: t("AI Brand Strategist", "AI Brand Strategist"), tagline: t("Brand positioning and monthly content strategy.", "Positioning brand dan strategi konten bulanan."), look: { skin: SKIN.light, hair: HAIR.brown, hairStyle: "bob", headwear: "glasses", prop: "chart" }, uniform: UNIFORM.concept, image: "/agents/concept-nova.webp" },
-  { name: "Aruna", role: t("AI Visual Director", "AI Visual Director"), tagline: t("Visual concepts and shot direction for photos and video.", "Konsep visual dan arahan foto serta video."), look: { skin: SKIN.tan, hair: HAIR.black, hairStyle: "long", headwear: "beret", prop: "phone" }, uniform: UNIFORM.concept, image: "/agents/concept-aruna.webp" },
-  { name: "Dara", role: t("AI Quality Controller", "AI Quality Controller"), tagline: t("Pre-checks every draft against brand and claim rules before human review.", "Cek awal setiap draft terhadap aturan brand dan klaim sebelum review manusia."), look: { skin: SKIN.brown, hair: HAIR.dark, hairStyle: "bun", headwear: "none", prop: "clipboard" }, uniform: UNIFORM.concept, image: "/agents/concept-dara.webp" },
-];
+// Nova, Aruna, Dara dipromosikan 2026-10-29 menjadi image-creator, video-creator, data-analyst (registry 0.6.0).
+export const CONCEPT_AGENTS: ConceptAgent[] = [];
 
 export function getTeam(): Member[] {
   return (registry.agents as Agent[]).map((a) => {

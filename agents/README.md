@@ -47,7 +47,7 @@ Daftar 5 pilar (`id`, `name.en`/`name.id`, `status`, `repo`). Nama, status, dan 
 | localizer | `localize` | skill `localize-content` |
 | report-builder | `report` | template `monthly-report` (sementara di Pilar 1) |
 
-Agent `planned`: sales-assistant & guest-messenger (Pilar 2 AI Sales), sop-writer (Pilar 3 AI Admin). report-builder aktif di Pilar 4 AI Business Intelligence.
+Agent `planned`: image-creator & video-creator (Pilar 1, intent `image`/`video`), sales-assistant & guest-messenger (Pilar 2 AI Sales), sop-writer (Pilar 3 AI Admin, juga `integration` dan `web-dev`), data-analyst (Pilar 4, `data-analysis`/`data-annotation`). Ditambahkan untuk model langganan (core AI-CONSTITUTION v4.0.0). report-builder aktif di Pilar 4 AI Business Intelligence.
 
 ## Konsistensi
 

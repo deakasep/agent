@@ -44,6 +44,8 @@ export default function TeamPage() {
         ))}
       </div>
 
+      {CONCEPT_AGENTS.length > 0 && (
+      <>
       <div className="section-label">
         <L en="Concept roles" id="Peran konsep" />
       </div>
@@ -76,6 +78,8 @@ export default function TeamPage() {
           </div>
         ))}
       </div>
+      </>
+      )}
     </>
   );
 }

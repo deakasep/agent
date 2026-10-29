@@ -39,8 +39,8 @@ def test_every_registry_agent_has_avatar():
 
 def test_concept_images_exist():
     team = (ROOT / "frontend" / "lib" / "team.ts").read_text(encoding="utf-8")
+    # Daftar konsep boleh kosong (Nova, Aruna, Dara dipromosikan ke registry 2026-10-29); yang dirujuk wajib ada.
     names = re.findall(r'image: "/agents/(concept-[a-z]+)\.webp"', team)
-    assert names, "no concept images referenced in frontend/lib/team.ts"
     for name in names:
         _check(name)
 

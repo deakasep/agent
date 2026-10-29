@@ -51,12 +51,15 @@ Setiap file `<agent-id>.md` berisi:
 | calendar-planner | Dimas | Perencana kalender konten | active | [calendar-planner.md](./calendar-planner.md) |
 | campaign-planner | Ayu | Perencana campaign musiman | active | [campaign-planner.md](./campaign-planner.md) |
 | localizer | Nara | Penyelaras bahasa ID ↔ EN | active | [localizer.md](./localizer.md) |
+| image-creator | Nova | Pembuat gambar promosi (brief & prompt) | planned | [image-creator.md](./image-creator.md) |
+| video-creator | Aruna | Pembuat video AI pendek (storyboard & prompt) | planned | [video-creator.md](./video-creator.md) |
 | report-builder | Intan | Penyusun laporan bulanan | active | [report-builder.md](./report-builder.md) |
+| data-analyst | Dara | Analisis & anotasi data | planned | [data-analyst.md](./data-analyst.md) |
 | sales-assistant | Galih | Asisten inquiry & reservasi | planned | [sales-assistant.md](./sales-assistant.md) |
 | guest-messenger | Sari | Komunikasi tamu (pre-arrival, in-stay) | planned | [guest-messenger.md](./guest-messenger.md) |
-| sop-writer | Teguh | Penulis SOP operasional | planned | [sop-writer.md](./sop-writer.md) |
+| sop-writer | Teguh | Penulis SOP, integrasi & developer | planned | [sop-writer.md](./sop-writer.md) |
 
-Nama di UI disetujui Dea Karisna (2026-10-07). Nama adalah identitas agent AI, bukan nama staf: UI selalu menampilkan label agent AI (prinsip 1).
+Nama di UI disetujui Dea Karisna (2026-10-07); Nova, Aruna, Dara (sebelumnya agent konsep) dipromosikan 2026-10-29 untuk tim agen langganan. Nama adalah identitas agent AI, bukan nama staf: UI selalu menampilkan label agent AI (prinsip 1).
 
 Agent `planned` sudah punya kartu supaya gaya dan batasnya disepakati **sebelum** pilarnya diaktifkan. Kartu tidak membuat agent boleh dijalankan.
 
