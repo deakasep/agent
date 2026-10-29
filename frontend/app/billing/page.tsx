@@ -42,8 +42,6 @@ export default function BillingPage() {
     document.title = `${tr("Credits & plan", "Kredit & paket")} · CLAU AI`;
     const pick = Number(new URLSearchParams(window.location.search).get("paket"));
     if ([1, 3, 6, 12].includes(pick)) setSuggested(pick);
-    const pick = Number(new URLSearchParams(window.location.search).get("paket"));
-    if ([1, 3, 6, 12].includes(pick)) setSuggested(pick);
     api<Catalog>("billing/catalog").then((r) => r.ok && setCatalog(r.data));
     api<Me>("auth/me").then(async (m) => {
       if (!m.ok) return setState(m.status === 401 ? "signed-out" : "unavailable");
