@@ -23,6 +23,8 @@ export default function BillingPage() {
   const [ledger, setLedger] = useState<CreditEntry[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  // Paket yang dipilih di situs publik (?paket=12 → /daftar → verifikasi → sini).
+  const [suggested, setSuggested] = useState<number | null>(null);
 
   const load = useCallback(async (c: string) => {
     const [w, l, p] = await Promise.all([
@@ -38,6 +40,10 @@ export default function BillingPage() {
 
   useEffect(() => {
     document.title = `${tr("Credits & plan", "Kredit & paket")} · CLAU AI`;
+    const pick = Number(new URLSearchParams(window.location.search).get("paket"));
+    if ([1, 3, 6, 12].includes(pick)) setSuggested(pick);
+    const pick = Number(new URLSearchParams(window.location.search).get("paket"));
+    if ([1, 3, 6, 12].includes(pick)) setSuggested(pick);
     api<Catalog>("billing/catalog").then((r) => r.ok && setCatalog(r.data));
     api<Me>("auth/me").then(async (m) => {
       if (!m.ok) return setState(m.status === 401 ? "signed-out" : "unavailable");
@@ -61,6 +67,11 @@ export default function BillingPage() {
     setMsg(null);
     const r = await api<Payment>("billing/checkout", { method: "POST", body: { client_code: code, ...body } });
     if (!r.ok) return setMsg({ ok: false, text: errorText(r, lang) });
+    try {
+      window.localStorage.removeItem("clau_plan");
+    } catch {
+      /* storage tidak tersedia */
+    }
     if (r.data.payment_url) {
       window.location.assign(r.data.payment_url);
       return;
@@ -131,9 +142,12 @@ export default function BillingPage() {
           {catalog && (
             <Card title={<L en="Plans" id="Paket" />}>
               <p className="muted">{tr(`All agents, ${catalog.monthly_credits} credits every month. Not renewed automatically.`, `Semua agent, ${catalog.monthly_credits} kredit setiap bulan. Tidak diperpanjang otomatis.`)}</p>
+              {suggested && !wallet?.subscription && (
+                <p className="auth-notice">{tr(`You picked the ${suggested}-month plan. Pay below to activate your AI team.`, `Anda memilih paket ${suggested} bulan. Bayar di bawah untuk mengaktifkan tim AI.`)}</p>
+              )}
               <div className="wf-row">
                 {catalog.plans.map((p) => (
-                  <button key={p.plan_months} type="button" className="btn" disabled={!canPay} onClick={() => pay({ kind: "subscription", plan_months: p.plan_months })}>
+                  <button key={p.plan_months} type="button" className={p.plan_months === suggested && !wallet?.subscription ? "btn btn--primary" : "btn"} disabled={!canPay} onClick={() => pay({ kind: "subscription", plan_months: p.plan_months })}>
                     {tr(`${p.plan_months} mo`, `${p.plan_months} bln`)} · {rupiah(p.price_idr)}{p.save_pct ? ` (-${p.save_pct}%)` : ""}
                   </button>
                 ))}
