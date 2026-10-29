@@ -67,7 +67,7 @@ Salin baris `ssh-ed25519 ...` yang muncul. Di GitHub: repo **clau-agent** → **
 ```bash
 echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" | sudo tee /etc/clau/known_hosts
 sudo mkdir -p /srv/clau
-sudo GIT_SSH_COMMAND="ssh -i /etc/clau/deploy_key -o IdentitiesOnly=yes -o UserKnownHostsFile=/etc/clau/known_hosts" git clone git@github.com:d34faiza-commits/clau-agent.git /srv/clau/clau-ai-agents
+sudo GIT_SSH_COMMAND="ssh -i /etc/clau/deploy_key -o IdentitiesOnly=yes -o UserKnownHostsFile=/etc/clau/known_hosts" git clone git@github.com:deakasep/agent.git /srv/clau/clau-ai-agents
 ```
 
 Host key di baris pertama = key resmi GitHub ([fingerprint GitHub](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints)).

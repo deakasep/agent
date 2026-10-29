@@ -4,7 +4,7 @@ Instruksi untuk ChatGPT/OpenAI Codex, Claude Code, dan AI coding agent lain.
 
 ## Baca sebelum bekerja
 
-1. [Status & handoff](https://github.com/d34faiza-commits/clau-content/blob/main/docs/status.md).
+1. [Status & handoff](https://github.com/deakasep/content/blob/main/docs/status.md).
 2. [Instruksi bersama](./core/AGENTS.md), [Constitution](./core/AI-CONSTITUTION.md),
    dan [Boundary](./core/AI-BOUNDARY.md).
 3. [Peta platform dan command](./CLAUDE.md), lalu dokumentasi area yang diubah.

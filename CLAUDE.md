@@ -2,13 +2,13 @@
 
 > Peta repo untuk AI agent. Baca file ini dulu sebelum menjelajah repo. Last updated: 2026-10-22
 
-> 🔔 **Sesi baru: baca [status & handoff CLAU AI](https://github.com/d34faiza-commits/clau-content/blob/main/docs/status.md) dulu** (otoritas, keputusan yang sudah diambil, status, pekerjaan terbuka). Repo Jerco milik Pak Indra: jangan disentuh tanpa persetujuan beliau.
+> 🔔 **Sesi baru: baca [status & handoff CLAU AI](https://github.com/deakasep/content/blob/main/docs/status.md) dulu** (otoritas, keputusan yang sudah diambil, status, pekerjaan terbuka). Repo Jerco milik Pak Indra: jangan disentuh tanpa persetujuan beliau.
 
 ## 1. Identitas
 
 | Item | Nilai |
 |---|---|
-| Repo | `d34faiza-commits/clau-agent` (public, hanya untuk dilihat; LICENSE) |
+| Repo | `deakasep/agent` (public, hanya untuk dilihat; LICENSE) |
 | Peran | Platform: registry agent, backend FastAPI, frontend Next.js |
 | Submodule | `core/` → clau-core |
 | Status | Backend v0.10.0: API registry + login & hak akses (sesi cookie, CSRF, 2FA wajib owner & content lead dengan QR & kode cadangan, `/users` owner) + workflow request → draft → QA → approval (`app/workflow.py`) + klien, fact sheet & Konfirmasi Fakta (`app/facts.py`), matriks izin Rule 08 dengan aturan di database, + **antrean AI menulis draft** (`app/ai/`: job, worker container terpisah, AI fact-check, batas biaya; provider tiruan, provider Claude menyusul PR 4c) + **penanda isi konten & level approval otomatis** (Rule 08: harga/promo, orang, iklan, review negatif, agama/adat, terjemahan ikut draft asal; migrasi 0007) di atas PostgreSQL 16 (migrasi 0001–0007), backup terenkripsi. UI: `/requests` (termasuk *Buat draft dengan AI*), `/fact-sheets`, `/ai-usage` (owner), tambah klien di `/users`. Belum: provider AI nyata |

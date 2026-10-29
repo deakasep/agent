@@ -35,7 +35,7 @@ Buka link yang muncul dan login dengan akun Tailscale owner. Di [admin Tailscale
 **3. Setup** (±10–15 menit, build pertama paling lama):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/d34faiza-commits/clau-agent/main/scripts/deploy/vps1-setup.sh -o /tmp/vps1-setup.sh
+curl -fsSL https://raw.githubusercontent.com/deakasep/agent/main/scripts/deploy/vps1-setup.sh -o /tmp/vps1-setup.sh
 sudo bash /tmp/vps1-setup.sh
 ```
 
@@ -45,7 +45,7 @@ Hasil akhir = daftar `clau-vps1-check`; yang wajib: **0 gagal**. Dashboard tampi
 
 Bila script berhenti dengan `GAGAL: ...`, jalankan ulang perintah `sudo bash /tmp/vps1-setup.sh` setelah penyebabnya diperbaiki (pesan menyebut langkahnya), atau kirim outputnya ke agent.
 
-**Repo kembali private?** Clone lewat HTTPS tanpa key hanya berlaku selama repo `clau-agent` public. Bila private: sebelum langkah 3, buat deploy key read-only untuk user `clau-deploy` (§ 5, key di `/var/lib/clau-deploy/.ssh/clau_agents_deploy`, alias `github-agents`) dan jalankan setup dengan `sudo CLAU_REPO_URL=git@github-agents:d34faiza-commits/clau-agent.git bash /tmp/vps1-setup.sh`.
+**Repo kembali private?** Clone lewat HTTPS tanpa key hanya berlaku selama repo `clau-agent` public. Bila private: sebelum langkah 3, buat deploy key read-only untuk user `clau-deploy` (§ 5, key di `/var/lib/clau-deploy/.ssh/clau_agents_deploy`, alias `github-agents`) dan jalankan setup dengan `sudo CLAU_REPO_URL=git@github-agents:deakasep/agent.git bash /tmp/vps1-setup.sh`.
 
 ## 1. Status (diperbarui 2026-10-22)
 
@@ -148,7 +148,7 @@ chmod 600 ~/.ssh/config
 ssh -T github-agents                          # "successfully authenticated"
 
 sudo mkdir -p /srv/clau && sudo chown dea:dea /srv/clau
-git clone git@github-agents:d34faiza-commits/clau-agent.git /srv/clau/clau-ai-agents
+git clone git@github-agents:deakasep/agent.git /srv/clau/clau-ai-agents
 cd /srv/clau/clau-ai-agents/frontend
 npm ci && npm run build
 ```
