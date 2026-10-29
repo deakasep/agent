@@ -173,6 +173,22 @@ Sumber aturan: core AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0 § Token Kana
 | Bayar | `CLAU_PAYMENT_PROVIDER=fake` (mode uji; owner melunasi lewat `simulate-paid`, ditolak bila `CLAU_ENV=production`) atau `midtrans` (Snap; lunas hanya dari webhook `POST /billing/webhooks/midtrans` dengan tanda tangan SHA512 + cek nominal, idempoten). Server key hanya di `.env` server |
 | Belum | Pendaftaran klien mandiri (sekarang owner membuat akun & klien), kedaluwarsa kredit top up 12 bulan (tanggal dicatat, belum ditegakkan), posting ke kanal setelah approve (OAuth Meta/TikTok) |
 
+## Pendaftaran Mandiri (0.12.0, TASK-003)
+
+`app/auth/signup.py` + `app/mail.py`, migrasi 0009 (`email_tokens`, `users.email_verified_at`, vertical UMKM).
+
+| Langkah | Endpoint | Catatan |
+|---|---|---|
+| Daftar | `POST /auth/signup` | Klien NYATA baru + user `client_approver` L3. Tidak pernah peran agency, tidak ada kredit gratis |
+| Verifikasi email | `POST /auth/verify-email` | Token dari email (48 jam, sekali pakai) → sesi langsung dibuat, frontend lanjut ke `/billing?paket=…` |
+| Kirim ulang verifikasi | `POST /auth/verification-email` | Respons selalu sama |
+| Lupa / reset password | `POST /auth/password-reset`, `/auth/password-reset/confirm` | Token 60 menit; semua sesi diputus; 2FA tetap diminta |
+
+- **Mati secara default.** Buka dengan `CLAU_SIGNUP_ENABLED=1` **dan** email yang siap: `CLAU_MAIL_BACKEND=smtp` + `CLAU_SMTP_HOST`/`PORT`/`USER`/`PASSWORD` + `CLAU_MAIL_FROM`. Tautan di email memakai `CLAU_PUBLIC_ORIGIN` (alamat dashboard, mis. `https://app.domain-anda.com`).
+- Lokal: `CLAU_MAIL_BACKEND=file CLAU_MAIL_DIR=./mail-dev` menulis email `.eml` ke folder (ditolak di produksi).
+- Respons daftar, kirim ulang, dan lupa password sama untuk email terdaftar maupun tidak; batas 3/jam per email dan `CLAU_SIGNUP_MAX_PER_HOUR` (default 30) total. Tambah juga `limit_req` Nginx per IP untuk `/api/auth/` saat deploy.
+- Akun daftar mandiri baru bisa login setelah email terverifikasi (403 `email_not_verified`).
+
 ## Belum Ada (Planned)
 
 Provider AI nyata (PR 4c), notifikasi ke klien, Portal Klien terpisah.

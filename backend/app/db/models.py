@@ -46,7 +46,10 @@ CLAIM_CATEGORIES = (
     "facility", "location", "price", "rating", "certification", "halal-dietary", "food-beverage",
     "treatment", "experience", "capacity", "safety", "license", "itinerary", "other",
 )
-VERTICALS = ("accommodation", "food-beverage", "spa-wellness", "experience", "wedding-event", "travel-tour")
+VERTICALS = ("accommodation", "food-beverage", "spa-wellness", "experience", "wedding-event", "travel-tour",
+             # UMKM umum (AI-CONSTITUTION v4.0.0 § 2, migrasi 0009): toko/online shop, jasa, lainnya.
+             "retail", "services", "other")
+EMAIL_TOKEN_PURPOSES = ("verify_email", "reset_password")
 PRIORITIES = ("Low", "Normal", "High", "Urgent")
 LEVELS = ("L1", "L2", "L3")
 MODES = ("NYATA", "SIMULASI")
@@ -140,6 +143,9 @@ class User(Base):
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     disabled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Migrasi 0009: null = daftar mandiri dan email belum diverifikasi (belum bisa login). Akun dari owner/CLI
+    # terisi otomatis (server default) karena dibuat oleh owner.
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), server_default=func.now())
     __table_args__ = (
         CheckConstraint("password_hash IS NULL OR password_hash LIKE '$argon2id$%'", name="password_argon2id"),
         CheckConstraint("NOT totp_enabled OR totp_secret_enc IS NOT NULL", name="totp_has_secret"),
@@ -184,6 +190,25 @@ class MfaRecoveryCode(Base):
     __table_args__ = (
         UniqueConstraint("user_id", "code_hash"),
         CheckConstraint("code_hash ~ '^[0-9a-f]{64}$'", name="code_hash_sha256"),
+    )
+
+
+class EmailToken(Base):
+    """Token sekali pakai di tautan email (verifikasi email, reset password). Hanya SHA-256 token yang disimpan;
+    token asli hanya ada di email. Migrasi 0009."""
+
+    __tablename__ = "email_tokens"
+    id: Mapped[int] = pk()
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    purpose: Mapped[str] = mapped_column(Text, nullable=False)
+    token_hash: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    created_at: Mapped[datetime] = created_at()
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    __table_args__ = (
+        CheckConstraint(one_of("purpose", EMAIL_TOKEN_PURPOSES), name="purpose"),
+        CheckConstraint("token_hash ~ '^[0-9a-f]{64}$'", name="token_hash_sha256"),
+        CheckConstraint("expires_at > created_at", name="expires_after_created"),
     )
 
 

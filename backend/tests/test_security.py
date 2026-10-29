@@ -101,6 +101,9 @@ ENDPOINTS = {
     # Login & akun (Tahap 1 PR 2): butuh sesi + CSRF, kecuali login sendiri.
     ("POST", "/auth/login"), ("GET", "/auth/me"), ("POST", "/auth/logout"), ("POST", "/auth/logout-all"),
     ("POST", "/auth/password"), ("POST", "/auth/mfa/setup"), ("POST", "/auth/mfa/confirm"), ("POST", "/auth/mfa/recovery-codes"),
+    # Pendaftaran mandiri (0.12.0): hanya klien baru + client_approver; respons sama untuk email terdaftar.
+    ("POST", "/auth/signup"), ("POST", "/auth/verify-email"), ("POST", "/auth/verification-email"),
+    ("POST", "/auth/password-reset"), ("POST", "/auth/password-reset/confirm"),
     # Manajemen user: khusus owner.
     ("GET", "/users"), ("POST", "/users"), ("PUT", "/users/{user_id}/memberships"),
     ("POST", "/users/{user_id}/disable"), ("POST", "/users/{user_id}/enable"),

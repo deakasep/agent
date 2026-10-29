@@ -1,7 +1,8 @@
 """Endpoint login, akun, 2FA, dan manajemen user (khusus owner). docs/security.md § 6.
 
-Tidak ada pendaftaran publik: owner pertama dibuat lewat `python -m app.auth.cli create-owner`, user lain
-dibuat owner lewat POST /users dengan password sementara yang wajib diganti saat login pertama.
+Owner pertama dibuat lewat `python -m app.auth.cli create-owner`; staf dan approver dibuat owner lewat POST /users
+dengan password sementara yang wajib diganti saat login pertama. Pendaftaran mandiri klien (hanya peran
+client_approver untuk klien baru) ada di app/auth/signup.py dan mati secara default (CLAU_SIGNUP_ENABLED).
 """
 
 from __future__ import annotations
@@ -240,6 +241,9 @@ def login(body: LoginRequest, request: Request, response: Response, db: Session 
     if not (active and password_ok):
         register_failure(db, settings, user, key, "password")
         raise invalid_credentials()
+    if user.email_verified_at is None:
+        # Daftar mandiri (app/auth/signup.py): password benar tetapi email belum diverifikasi.
+        raise ApiError(403, "email_not_verified", "Verifikasi email dulu lewat tautan yang kami kirim.")
 
     used_recovery = False
     if user.totp_enabled:

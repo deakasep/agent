@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"password" | "totp" | "recovery">("password");
   const [error, setError] = useState("");
+  const [notVerified, setNotVerified] = useState(false);
   const [busy, setBusy] = useState(false);
   const [next, setNext] = useState("/");
   // VPS 1 (pratinjau tanpa backend): form tidak ditampilkan, karena login memang belum aktif di sana.
@@ -42,6 +43,7 @@ export default function LoginPage() {
       setStep("totp");
       return;
     }
+    setNotVerified(r.code === "email_not_verified");
     setError(errorText(r, lang));
   }
 
@@ -55,7 +57,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <PageHeader title={<L en="Sign in" id="Masuk" />} subtitle={<L en="Agency staff and client approvers. Accounts are created by the owner." id="Staf agency dan approver klien. Akun dibuat oleh owner." />} />
+      <PageHeader title={<L en="Sign in" id="Masuk" />} subtitle={<L en="Business owners, approvers, and CLAU staff." id="Pemilik usaha, approver, dan staf CLAU." />} />
       <div className="auth-narrow">
         <Card>
           {preview ? (
@@ -94,6 +96,19 @@ export default function LoginPage() {
               <button type="submit" className="btn btn--primary" disabled={busy || !email || !password || !codeValid}>
                 {busy ? tr("Checking…", "Memeriksa…") : step === "password" ? tr("Sign in", "Masuk") : tr("Verify", "Verifikasi")}
               </button>
+              {step === "password" && (
+                <p className="muted">
+                  <a href="/lupa-password">{tr("Forgot password?", "Lupa password?")}</a>
+                  {" · "}
+                  {tr("New here? ", "Belum punya akun? ")}
+                  <a href="/daftar">{tr("Create an account", "Daftar")}</a>
+                </p>
+              )}
+              {error && notVerified && (
+                <p className="muted">
+                  <a href="/verifikasi-email">{tr("Send a new verification link", "Kirim ulang tautan verifikasi")}</a>
+                </p>
+              )}
               {step !== "password" && (
                 <button type="button" className="link-btn" onClick={useRecovery}>
                   {step === "totp" ? tr("Lost your phone? Use a backup code", "HP hilang? Pakai kode cadangan") : tr("Use the authenticator app instead", "Pakai aplikasi authenticator saja")}

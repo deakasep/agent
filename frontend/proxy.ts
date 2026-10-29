@@ -7,7 +7,8 @@ import { NextResponse, type NextRequest } from "next/server";
 const SESSION_COOKIES = ["__Host-clau_session", "clau_session_dev"];
 
 function isPublic(pathname: string) {
-  return pathname === "/login" || pathname.startsWith("/api/") || pathname.startsWith("/_next/") || /\.(webp|png|svg|ico|txt)$/.test(pathname);
+  // Halaman akun publik: daftar mandiri, verifikasi email, lupa & reset password.
+  return ["/login", "/daftar", "/verifikasi-email", "/lupa-password", "/reset-password"].includes(pathname) || pathname.startsWith("/api/") || pathname.startsWith("/_next/") || /\.(webp|png|svg|ico|txt)$/.test(pathname);
 }
 
 export function proxy(request: NextRequest) {
