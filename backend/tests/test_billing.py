@@ -1,4 +1,4 @@
-"""Langganan & kredit (kontrak core 0.11.0, AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0), ke PostgreSQL sungguhan.
+"""Langganan & kredit (kontrak core 0.11.0 + 0.14.0 hangus top up, AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0), ke PostgreSQL sungguhan.
 
 Menguji: katalog sama dengan registry & harga publik, checkout (peran, nominal dari server, satu tagihan pending),
 lunas lewat simulasi owner dan webhook Midtrans bertanda tangan (idempoten, nominal dicek), kredit bulanan (hibah &
@@ -264,3 +264,64 @@ def test_database_rules_for_credits_and_payments(factory, team, bill):
         violates(s, "subscription_payment_mismatch",
                  "INSERT INTO subscriptions (client_code, payment_id, plan_months, starts_at, ends_at)"
                  " SELECT 'BILC', id, 1, now(), now() + interval '1 month' FROM payments WHERE client_code = 'BILB' LIMIT 1")
+
+
+# --- Hangus top up 12 bulan (kontrak core 0.14.0, migrasi 0011) ------------------------------------------------------
+
+
+def paid_topup(factory, owner_id: int, code: str, credits: int, paid_at: datetime) -> int:
+    from app.billing.ledger import apply_paid
+
+    with factory() as s, s.begin():
+        p = Payment(client_code=code, kind="topup", credits=credits, amount_idr=cat.TOPUPS[credits], provider="fake",
+                    order_id=f"CLAU-{code}-{int(paid_at.timestamp())}-{credits:06d}", requested_by=owner_id)
+        s.add(p)
+        s.flush()
+        apply_paid(s, p, method="simulasi", at=paid_at)
+        return p.id
+
+
+def test_topup_expires_after_twelve_months_and_wallet_shows_next_expiry(factory, team):
+    with factory() as s, s.begin():
+        s.add(Client(client_code="BILD", vertical="accommodation", business_type="villa", approver_role="owner"))
+    approver = Actor(factory, "client_approver", scope="BILD", level="L2")
+    t = datetime.now(timezone.utc)
+    old = paid_topup(factory, team["owner"].id, "BILD", 250, t - timedelta(days=400))  # sudah lewat 12 bulan
+    new = paid_topup(factory, team["owner"].id, "BILD", 550, t - timedelta(days=30))
+
+    w = wallet(approver, "BILD")
+    assert w["balance"] == {"monthly": 0, "topup": 550, "total": 550}
+    assert w["topup_next_expiry"]["credits"] == 550
+    items = approver.get("/billing/ledger", client_code="BILD").json()["items"]
+    assert [(e["reason"], e["delta"], e["payment_id"]) for e in items if e["reason"] == "topup_expire"] == [("topup_expire", -250, old)]
+    # Idempoten: dompet dibuka lagi tidak menghanguskan dua kali.
+    assert wallet(approver, "BILD")["balance"]["topup"] == 550
+
+    # Pengurangan setelah top up lama hangus memotong top up yang masih berlaku.
+    r = team["owner"].post("/billing/adjustments", {"client_code": "BILD", "credits": -100, "note": "koreksi uji"})
+    assert r.status_code == 201, r.text
+    w = wallet(approver, "BILD")
+    assert w["balance"]["topup"] == 450 and w["topup_next_expiry"]["credits"] == 450
+
+    with factory() as s:
+        # Database menolak hangus sebelum waktunya dan hangus ganda.
+        violates(s, "credit_entry_invalid",
+                 "INSERT INTO credit_ledger (client_code, delta, bucket, reason, payment_id) VALUES ('BILD', -10, 'topup', 'topup_expire', :p)",
+                 {"p": new})
+        violates(s, "uq_credit_ledger_topup_expire",
+                 "INSERT INTO credit_ledger (client_code, delta, bucket, reason, payment_id) VALUES ('BILD', -1, 'topup', 'topup_expire', :p)",
+                 {"p": old})
+        violates(s, "credit_entry_invalid",
+                 "INSERT INTO credit_ledger (client_code, delta, bucket, reason, payment_id) VALUES ('BILD', 5, 'topup', 'topup_expire', :p)",
+                 {"p": old})
+
+
+def test_fresh_topup_is_not_expired_early(factory, team, bill):
+    # Top up yang baru lunas berlaku penuh: tidak ada yang dihanguskan sebelum 12 bulan.
+    from app.billing.ledger import ensure_credits
+
+    paid_topup(factory, team["owner"].id, "BILA", 250, datetime.now(timezone.utc) - timedelta(days=1))
+    with factory() as s, s.begin():
+        result = ensure_credits(s, "BILA")
+        assert balances(s, "BILA")["topup"] == 250
+        assert sum(x.remaining for x in result.open_lots) == 250

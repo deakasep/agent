@@ -123,7 +123,7 @@ jobs:
           scripts/db-backup.sh
           backup="$(ls -1 backups/*.dump.enc | tail -1)"
           scripts/db-restore.sh --verify "$backup" | tee restore.log
-          grep -q "migrasi 0010" restore.log
+          grep -q "migrasi 0011" restore.log
           # Backup yang diubah 1 byte harus ditolak (HMAC).
           # (`! cmd` tidak menggagalkan step di bash -e; pakai `if`.)
           printf 'x' >> "$backup"
@@ -139,15 +139,15 @@ jobs:
           if printf '%s\npulihkan\n' "$n" | scripts/deploy/vps2-restore.sh; then echo "::error::konfirmasi salah diterima"; exit 1; fi
           printf '%s\nPULIHKAN\n' "$n" | scripts/deploy/vps2-restore.sh | tee restore-full.log
           grep -q "restore selesai" restore-full.log
-          test "$(psql_ci -c 'SELECT version_num FROM alembic_version')" = 0010
+          test "$(psql_ci -c 'SELECT version_num FROM alembic_version')" = 0011
           test "$(psql_ci -c "SELECT count(*) FROM audit_log WHERE action = 'database.restore'")" = 1
           ls backups/*-sebelum-restore.dump.enc
           # Backup dari versi aplikasi yang lebih baru: dibatalkan otomatis, database & backend tetap seperti semula.
           psql_ci -c "UPDATE alembic_version SET version_num = '9999'"
           scripts/db-backup.sh ci-versi-baru
-          psql_ci -c "UPDATE alembic_version SET version_num = '0010'"
+          psql_ci -c "UPDATE alembic_version SET version_num = '0011'"
           if scripts/db-restore.sh --yes "$(ls -1 backups/*ci-versi-baru.dump.enc)"; then echo "::error::backup versi baru diterima"; exit 1; fi
-          test "$(psql_ci -c 'SELECT version_num FROM alembic_version')" = 0010
+          test "$(psql_ci -c 'SELECT version_num FROM alembic_version')" = 0011
           test "$(psql_ci -c "SELECT count(*) FROM audit_log WHERE action = 'database.restore'")" = 1
           curl -fsS http://127.0.0.1:8000/health
           curl -fsS -o /dev/null http://127.0.0.1:3000/

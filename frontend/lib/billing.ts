@@ -1,4 +1,4 @@
-// Tipe & format langganan & kredit (kontrak core api-contracts 0.11.0 § Langganan & Kredit).
+// Tipe & format langganan & kredit (kontrak core api-contracts 0.11.0 § Langganan & Kredit; 0.14.0 hangus top up).
 
 export type Catalog = {
   currency: "IDR";
@@ -12,6 +12,8 @@ export type Wallet = {
   client_code: string;
   balance: { monthly: number; topup: number; total: number };
   subscription: { plan_months: number; starts_at: string; ends_at: string; active: boolean; period_start: string; next_reset: string | null } | null;
+  /** 0.14.0: sisa kredit top up yang paling cepat hangus (12 bulan sejak lunas). */
+  topup_next_expiry: { credits: number; expires_at: string } | null;
   simulation: boolean;
 };
 
@@ -20,7 +22,7 @@ export type CreditEntry = {
   client_code: string;
   delta: number;
   bucket: "monthly" | "topup";
-  reason: "monthly_grant" | "monthly_expire" | "topup" | "usage" | "refund" | "adjustment";
+  reason: "monthly_grant" | "monthly_expire" | "topup" | "topup_expire" | "usage" | "refund" | "adjustment";
   ai_job_id: number | null;
   payment_id: number | null;
   note: string | null;
@@ -50,6 +52,7 @@ export const rupiah = (n: number) => "Rp" + n.toLocaleString("id-ID");
 export const REASON: Record<CreditEntry["reason"], [string, string]> = {
   monthly_grant: ["Monthly credits", "Kredit bulanan"],
   monthly_expire: ["Unused monthly credits expired", "Sisa kredit bulanan hangus"],
+  topup_expire: ["Top-up credits expired (12 months)", "Sisa kredit top up hangus (12 bulan)"],
   topup: ["Top up", "Top up"],
   usage: ["AI job", "Job AI"],
   refund: ["Refund (job failed or cancelled)", "Kredit kembali (job gagal/dibatalkan)"],

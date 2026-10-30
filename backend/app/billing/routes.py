@@ -18,7 +18,8 @@ from sqlalchemy.orm import Session
 from app.auth.access import can_access_client
 from app.auth.deps import AuthContext, current_user, get_db, require_owner
 from app.billing.catalog import PLANS, TOPUPS, catalog
-from app.billing.ledger import active_subscription, apply_paid, balances, current_period, ensure_monthly, lock, now
+from app.billing.ledger import active_subscription, apply_paid, balances, current_period, ensure_credits, ensure_topup_expiry, lock, now
+from app.billing.topup_expiry import next_expiry
 from app.billing.provider import (
     GatewayError,
     billing_settings,
@@ -73,7 +74,7 @@ def get_catalog() -> dict:
 def get_wallet(client_code: str = Query(pattern=CLIENT_CODE_RE), ctx: AuthContext = Depends(current_user), db: Session = Depends(get_db)) -> dict:
     client = require_client(db, ctx, client_code)
     at = now()
-    ensure_monthly(db, client_code, at)
+    expiry = next_expiry(ensure_credits(db, client_code, at))
     db.commit()
     sub = active_subscription(db, client_code, at)
     subscription = None
@@ -81,7 +82,9 @@ def get_wallet(client_code: str = Query(pattern=CLIENT_CODE_RE), ctx: AuthContex
         start, nxt = current_period(sub, at)
         subscription = {"plan_months": sub.plan_months, "starts_at": iso(sub.starts_at), "ends_at": iso(sub.ends_at),
                         "active": True, "period_start": iso(start), "next_reset": iso(nxt) if nxt < sub.ends_at else None}
-    return {"client_code": client_code, "balance": balances(db, client_code), "subscription": subscription, "simulation": client.simulation}
+    topup_next_expiry = {"credits": expiry["credits"], "expires_at": iso(expiry["expires_at"])} if expiry else None
+    return {"client_code": client_code, "balance": balances(db, client_code), "subscription": subscription,
+            "topup_next_expiry": topup_next_expiry, "simulation": client.simulation}
 
 
 @router.get("/ledger")
@@ -214,7 +217,7 @@ def adjust(body: AdjustmentIn, ctx: AuthContext = Depends(require_owner), db: Se
     if body.credits == 0:
         raise ApiError(422, "validation_error", "Request tidak valid: credits")
     require_client(db, ctx, body.client_code)
-    lock(db, body.client_code)
+    ensure_topup_expiry(db, body.client_code)  # top up kedaluwarsa tidak ikut dihitung sebagai saldo yang bisa dikurangi
     if balances(db, body.client_code)["topup"] + body.credits < 0:
         raise ApiError(409, "credit_insufficient", "Saldo kredit tidak cukup untuk dikurangi sebanyak itu.")
     entry = CreditEntry(client_code=body.client_code, delta=body.credits, bucket="topup", reason="adjustment",
