@@ -36,6 +36,7 @@
 | `docs/deploy/vps-1-setup.md` | VPS 1 (pratinjau, tanpa login, tanpa data): § 0 VPS baru/pengganti satu perintah (`vps1-setup.sh`), auto-deploy, user khusus, `clau-vps1-check` |
 | `docs/deploy/vps-2-setup.md` | VPS 2 (backend + database + login, tanpa domain: HTTPS Tailscale khusus tailnet): `scripts/deploy/vps2-setup.sh`, deploy otomatis dengan rollback skema, backup terenkripsi tiap 6 jam + Backblaze B2, pemulihan manual `clau-vps2-restore` (§ 5, termasuk server pengganti), `clau-vps2-check` |
 | `docs/security.md` | Audit & aturan keamanan: header, Nginx, sandbox systemd, supply chain; **aturan wajib sebelum login/DB/AI/WhatsApp di VPS 2** (§ 6) |
+| `.claude/` | Komponen Claude buatan Anthropic yang direview & dikunci commit: `/code-review`, `/review-pr` + 6 agen pemeriksa; daftar, lisensi & aturan keamanan di `.claude/VENDORED.md` |
 | `docs/post-vps-checklist.md` | **Pengingat:** langkah wajib setelah VPS 1 & 2 siap (AI provider, eval 33 kasus, aktivasi pilar 2–4) |
 
 > 🔔 **Pengingat untuk agent:** bila owner menyebut VPS sudah siap, buka `docs/post-vps-checklist.md` dan ingatkan langkah-langkahnya.
