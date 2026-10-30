@@ -22,12 +22,14 @@ Peningkatan kualitas (4K, vinyl mengilap, adegan nyata, pose aksi) tanpa menggan
 
 ## Status per gambar
 
+Semua gambar v1 disetujui owner Dea Karisna (2026-10-30, sesi Claude). Perintah owner lewat chat = persetujuan; tidak ada langkah persetujuan terpisah.
+
 | Agent | Status | Catatan |
 |---|---|---|
-| caption-writer, reel-scripter, story-writer, listing-writer, review-responder, calendar-planner, campaign-planner, localizer, sales-assistant | `ASSUMPTION` | Diterima di sesi 2026-10-08; menunggu konfirmasi Pak Indra / Dea Karisna saat review PR |
-| report-builder | `ASSUMPTION` | Nama ditukar Galih → Intan (2026-10-08) agar sesuai figur; opsional: generate ulang menghadap depan |
-| image-creator, video-creator, data-analyst | `ASSUMPTION` | Dulu concept-nova/aruna/dara; dipromosikan 2026-10-29 (planned, persona & eval ada) |
-| guest-messenger, sop-writer | `ASSUMPTION` | Diganti 2026-10-08: layar HP tanpa teks (Sari), proporsi chibi diseragamkan (Teguh) |
+| caption-writer, reel-scripter, story-writer, listing-writer, review-responder, calendar-planner, campaign-planner, localizer, sales-assistant | `DATA FINAL` | Diterima di sesi 2026-10-08; disetujui owner Dea Karisna 2026-10-30 |
+| report-builder | `DATA FINAL` | Nama ditukar Galih → Intan (2026-10-08) agar sesuai figur; opsional: generate ulang menghadap depan |
+| image-creator, video-creator, data-analyst | `DATA FINAL` | Dulu concept-nova/aruna/dara; dipromosikan 2026-10-29 (planned, persona & eval ada) |
+| guest-messenger, sop-writer | `DATA FINAL` | Diganti 2026-10-08: layar HP tanpa teks (Sari), proporsi chibi diseragamkan (Teguh) |
 
 Prompt dasar yang dipakai:
 

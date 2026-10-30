@@ -1,6 +1,6 @@
 # Arahan Visual v2 — figur agen CLAU sekelas Sintra (tetap karakter CLAU)
 
-Status: `ASSUMPTION` — usulan 2026-10-30 atas permintaan owner, menunggu konfirmasi Pak Indra / Dea Karisna. Karakter v1 (15 figur di folder
+Status: `DATA FINAL` — disetujui & diperintahkan owner Dea Karisna, 2026-10-30 (sesi Claude). Karakter v1 (15 figur di folder
 ini) **dipertahankan**: wajah, rambut, pakaian, dan benda tugas sama. Yang dinaikkan hanya kualitas render, pencahayaan, pose, dan adegan.
 Jangan meniru desain milik Sintra (helm/baju astronot, nama, logo); yang ditiru hanya tingkat kualitas dan konsep "figur mainan + foto nyata".
 
@@ -73,4 +73,4 @@ Bayu, Laras membawa gelembung hati), tangan manusia boleh tampak sebagian dari s
   hero/adegan dalam AVIF/WebP beberapa ukuran (mis. 640/1280/1920/3840) untuk `srcset`, supaya cepat di HP.
 - Animasi di situs (repo web, library `motion`): satu momen pembuka (figur muncul bergantian) + kartu agen bergerak saat disentuh;
   hormati `prefers-reduced-motion` (skill `frontend-design`).
-- Karakter tetap fiktif, tidak meniru orang nyata; UI tetap menandai "AI …". Gambar baru = status `ASSUMPTION` sampai Pak Indra / Dea Karisna setuju.
+- Karakter tetap fiktif, tidak meniru orang nyata; UI tetap menandai "AI …". Gambar baru dipakai setelah owner memilihnya di chat (itu persetujuannya).
