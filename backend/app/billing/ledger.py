@@ -1,4 +1,4 @@
-"""Buku kredit: saldo, hibah bulanan (lazy, tanpa cron), pemotongan untuk job AI, dan efek pembayaran lunas.
+"""Buku kredit: saldo, hibah bulanan & hangus top up (lazy, tanpa cron), pemotongan untuk job AI, efek pembayaran lunas.
 
 Semua penulisan ke credit_ledger dikunci per klien (advisory lock yang sama dengan trigger migrasi 0008), jadi cek
 saldo + tulis tidak balapan. Aturan akhirnya tetap ditegakkan database (credit_entry_invalid / credit_insufficient).
@@ -13,6 +13,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from app.billing.catalog import MONTHLY_CREDITS, TOPUP_VALID_MONTHS
+from app.billing.topup_expiry import Entry, Result, plan
 from app.db.models import AuditLog, CreditEntry, Payment, Subscription
 from app.errors import ApiError
 
@@ -94,9 +95,47 @@ def ensure_monthly(db: Session, client_code: str, at: datetime | None = None) ->
     db.flush()
 
 
+def topup_entries(db: Session, client_code: str) -> list[Entry]:
+    rows = db.execute(
+        select(CreditEntry.id, CreditEntry.created_at, CreditEntry.delta, CreditEntry.reason, CreditEntry.payment_id, CreditEntry.expires_at)
+        .where(CreditEntry.client_code == client_code, CreditEntry.bucket == "topup")
+    ).all()
+    return [Entry(id=r.id, created_at=r.created_at, delta=r.delta, reason=r.reason, payment_id=r.payment_id, expires_at=r.expires_at)
+            for r in rows]
+
+
+def ensure_topup_expiry(db: Session, client_code: str, at: datetime | None = None) -> Result:
+    """Sisa top up yang lewat masa berlakunya (12 bulan sejak lunas) dihanguskan lewat `topup_expire` (migrasi 0011).
+    Lazy seperti kredit bulanan: dipanggil saat dompet dibaca dan sebelum kredit dipotong. Idempoten."""
+    at = at or now()
+    lock(db, client_code)
+    # Trigger memakai now() transaksi; jangan menghanguskan lebih awal dari waktu database.
+    at = min(at, db.scalar(select(func.now())))
+    result = plan(topup_entries(db, client_code), at)
+    if result.to_expire:
+        available = balances(db, client_code)["topup"]
+        for payment_id, credits in result.to_expire:
+            amount = min(credits, available)
+            if amount <= 0:
+                continue
+            db.add(CreditEntry(client_code=client_code, delta=-amount, bucket="topup", reason="topup_expire", payment_id=payment_id))
+            available -= amount
+        db.flush()
+        result = plan(topup_entries(db, client_code), at)
+    return result
+
+
+def ensure_credits(db: Session, client_code: str, at: datetime | None = None) -> Result:
+    """Kredit bulanan periode berjalan + hangus top up kedaluwarsa, dalam satu kunci per klien."""
+    at = at or now()
+    ensure_monthly(db, client_code, at)
+    return ensure_topup_expiry(db, client_code, at)
+
+
 def charge(db: Session, client_code: str, credits: int, ai_job_id: int) -> list[CreditEntry]:
-    """Potong kredit untuk job AI yang baru dibuat: bulanan dulu, lalu top up. Saldo kurang → 402, sebelum commit."""
-    ensure_monthly(db, client_code)
+    """Potong kredit untuk job AI yang baru dibuat: bulanan dulu, lalu top up (yang paling cepat kedaluwarsa; pembagian
+    per top up dihitung app/billing/topup_expiry.py). Saldo kurang → 402, sebelum commit."""
+    ensure_credits(db, client_code)
     bal = balances(db, client_code)
     if bal["total"] < credits:
         raise ApiError(402, "credits_insufficient", f"Kredit tidak cukup: butuh {credits}, sisa {bal['total']}. Top up dari dashboard.")

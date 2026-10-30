@@ -132,6 +132,11 @@ export default function BillingPage() {
             <Kpi label={tr("Plan", "Paket")} value={wallet.subscription ? tr(`${wallet.subscription.plan_months} mo`, `${wallet.subscription.plan_months} bln`) : "—"}
               hint={wallet.subscription ? tr(`until ${formatDate(wallet.subscription.ends_at, lang)}`, `s.d. ${formatDate(wallet.subscription.ends_at, lang)}`) : tr("No active plan", "Belum ada paket aktif")} />
             <Kpi label={tr("Next reset", "Reset berikutnya")} value={wallet.subscription?.next_reset ? formatDate(wallet.subscription.next_reset, lang) : "—"} />
+            <Kpi label={tr("Top-up expiring next", "Top up terdekat hangus")}
+              value={wallet.topup_next_expiry ? wallet.topup_next_expiry.credits.toLocaleString("id-ID") : "—"}
+              hint={wallet.topup_next_expiry
+                ? tr(`on ${formatDate(wallet.topup_next_expiry.expires_at, lang)}`, `pada ${formatDate(wallet.topup_next_expiry.expires_at, lang)}`)
+                : tr("Top-up credits are valid 12 months", "Kredit top up berlaku 12 bulan")} />
           </div>
         </>
       )}

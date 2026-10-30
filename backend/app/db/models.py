@@ -609,7 +609,7 @@ PAYMENT_STATUSES = ("pending", "paid", "expired", "failed")
 PAYMENT_PROVIDERS = ("fake", "midtrans")
 PLAN_MONTHS = (1, 3, 6, 12)
 CREDIT_BUCKETS = ("monthly", "topup")
-CREDIT_REASONS = ("monthly_grant", "monthly_expire", "topup", "usage", "refund", "adjustment")
+CREDIT_REASONS = ("monthly_grant", "monthly_expire", "topup", "topup_expire", "usage", "refund", "adjustment")
 
 
 class Payment(Base):
@@ -665,7 +665,7 @@ class Subscription(Base):
 
 class CreditEntry(Base):
     """Buku kredit append-only. Saldo = jumlah delta per bucket; aturan per reason, saldo tidak negatif, dan tidak ada
-    hibah/refund ganda ditegakkan trigger + indeks unik (migrasi 0008)."""
+    hibah/refund ganda ditegakkan trigger + indeks unik (migrasi 0008). Top up hangus 12 bulan setelah lunas (`topup_expire`, 0011)."""
 
     __tablename__ = "credit_ledger"
     id: Mapped[int] = pk()
@@ -689,6 +689,7 @@ class CreditEntry(Base):
         Index("uq_credit_ledger_monthly", "subscription_id", "period_start", "reason", unique=True,
               postgresql_where=text("reason IN ('monthly_grant', 'monthly_expire')")),
         Index("uq_credit_ledger_topup", "payment_id", unique=True, postgresql_where=text("reason = 'topup'")),
+        Index("uq_credit_ledger_topup_expire", "payment_id", unique=True, postgresql_where=text("reason = 'topup_expire'")),
         Index("uq_credit_ledger_job", "ai_job_id", "bucket", "reason", unique=True, postgresql_where=text("ai_job_id IS NOT NULL")),
         Index("ix_credit_ledger_created_at", "created_at"),
     )
