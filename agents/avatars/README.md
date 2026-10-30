@@ -9,6 +9,8 @@ Figur 3D (gaya figurine chibi, latar mint `#DDF4EE`) untuk 15 agent di `registry
 
 Agent konsep (belum ada di registry) memakai `concept-<nama>.webp`; konsep tanpa gambar jatuh ke karakter SVG (`frontend/components/Character.tsx`). Nova, Aruna, Dara (konsep sejak 2026-10-08) dipromosikan 2026-10-29 menjadi `image-creator`, `video-creator`, `data-analyst` (file di-rename, gambar sama).
 
+Peningkatan kualitas (4K, vinyl mengilap, adegan nyata, pose aksi) tanpa mengganti karakter: [arahan-visual-v2.md](./arahan-visual-v2.md).
+
 ## Aturan
 
 - Karakter fiktif; tidak meniru wajah staf atau orang nyata.
