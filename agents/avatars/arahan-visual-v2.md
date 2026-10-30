@@ -4,6 +4,8 @@ Status: `DATA FINAL` — disetujui & diperintahkan owner Dea Karisna, 2026-10-30
 ini) **dipertahankan**: wajah, rambut, pakaian, dan benda tugas sama. Yang dinaikkan hanya kualitas render, pencahayaan, pose, dan adegan.
 Jangan meniru desain milik Sintra (helm/baju astronot, nama, logo); yang ditiru hanya tingkat kualitas dan konsep "figur mainan + foto nyata".
 
+**Gaya acuan (disetujui owner 2026-10-30):** [`adegan/caption-writer.webp`](./adegan/caption-writer.webp) — Tara di kafe. Prompt siap tempel 15 agen: [`adegan/PROMPT.md`](./adegan/PROMPT.md).
+
 ## 1. Kenapa v1 terasa kurang detail (dibanding sintra.ai, dilihat 2026-10-30)
 
 | Aspek | Sintra | CLAU v1 | Arah v2 |
