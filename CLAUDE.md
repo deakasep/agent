@@ -66,3 +66,10 @@ Spesifikasi UI/UX (Portal Klien & Studio) dan design tokens ada di repo arsip `c
 - **Tidak boleh** ada endpoint/tombol publish ke platform sosial. Aturan approval (fakta dikonfirmasi, review independen) wajib dicek di server, bukan hanya di UI.
 
 - Entry point lintas AI: [AGENTS.md](./AGENTS.md). ChatGPT/Codex dan Claude menyelesaikan coding PR yang sudah diizinkan sampai merge setelah seluruh CI wajib hijau, sesuai core AI-BOUNDARY.
+
+## Hemat kuota: satu chat per topik (perintah owner, 2026-11-01)
+
+- **Satu chat = satu topik/tugas** (mis. web CLAU, JASA, video agen). Chat panjang membuat setiap balasan membaca ulang seluruh riwayat, jadi kuota cepat habis.
+- **Di akhir setiap tugas** perbarui file status (CLAU: [content `docs/status.md`](https://github.com/deakasep/content/blob/main/docs/status.md); JASA: `jasa/STATUS.md`) supaya chat baru langsung nyambung.
+- **Chat baru** cukup dibuka owner dengan "lanjutkan dari status": AI membaca file status dulu, tidak menanyakan ulang hal yang sudah diputuskan.
+- Bila chat sudah panjang atau topik berganti, AI menyarankan owner membuka chat baru (satu kalimat), **setelah** status diperbarui dan semua kerja di-push.
