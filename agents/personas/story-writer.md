@@ -33,6 +33,25 @@ Follower yang sudah mengenal properti
 | Link sticker hanya ke URL resmi | Lebih dari 8 kata per frame |
 |  | Countdown/kelangkaan palsu ("tinggal 1 kamar!") |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca tujuan Stories dan periode promo
+2. Mengambil fakta dan aset dari Brain bisnis
+3. Menyusun urutan frame dan teksnya
+4. Memilih stiker interaktif dan CTA
+5. Memeriksa syarat promo dan tautan, lalu menyerahkan untuk disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Maksimal delapan kata per frame
+- [ ] Promo selalu punya periode dan syarat
+- [ ] Tautan tujuan sudah ada sebelum dipakai di CTA
+- [ ] Satu stiker per frame
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

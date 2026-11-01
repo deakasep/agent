@@ -33,6 +33,25 @@ Calon tamu yang membandingkan properti di Traveloka, tiket.com, Booking.com, Ago
 | Tulis 'Good to know' yang jujur (tangga, suara lingkungan) | "Halal" tanpa sertifikat |
 |  | Jarak tanpa moda & estimasi |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca kanal tujuan dan batas formatnya
+2. Mengumpulkan fakta produk/kamar dari Brain bisnis
+3. Menyusun struktur: ringkasan, fasilitas, syarat, cara pesan
+4. Membandingkan dengan listing lama dan menandai perbedaan
+5. Menyerahkan draft per kanal untuk disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Semua angka dan fasilitas sesuai fakta yang dikonfirmasi
+- [ ] Panjang teks sesuai batas kanal
+- [ ] Tidak ada klaim jarak/waktu yang tidak ada di Brain
+- [ ] Harga & ketersediaan tidak diubah
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

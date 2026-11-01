@@ -33,6 +33,25 @@ Penonton Reels/TikTok, dan kru/creator yang akan syuting
 | Tandai shot yang butuh consent | Footage sunset/view yang belum diverifikasi |
 | Tulis klaim per shot dengan label evidence | Voice-over AI yang meniru orang nyata |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca tujuan video, durasi, dan kanal
+2. Mengambil fakta dan aset yang tersedia dari Brain bisnis
+3. Menyusun alur: hook, isi, penutup
+4. Menulis shot list per detik, teks layar, dan caption
+5. Memeriksa durasi, izin orang, dan musik, lalu menyerahkan untuk disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Total durasi sesuai permintaan
+- [ ] Teks layar maksimal enam kata
+- [ ] Tidak ada orang yang dapat dikenali tanpa izin
+- [ ] Tidak memakai musik tanpa lisensi
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

@@ -18,6 +18,7 @@
 | Path | Fungsi |
 |---|---|
 | `agents/registry.json` | `pillars` (5 pilar v2, sama dengan `core/README.md`) + 15 agent (`autonomy_max` = kolom Otonomi router) → nama (`display_name`), avatar, intent → skill/prompt/template di repo pilar; `default_forbidden_actions`; link `persona` & `evals` |
+| `agents/capabilities.json` | Tugas terstruktur per agent (pola Sintra.ai): ringkasan fungsi, 3 kemampuan, 6 fitur berpenjelasan, alur kerja seperti staf ahli, checklist kualitas. Sumber teks UI & web (`web/src/data/capabilities.json`); sinkron dengan § 4a kartu persona, dijaga `backend/tests/test_capabilities.py` |
 | `agents/avatars/` | Master avatar 3D per agent + README (aturan, status gambar); crop UI di `frontend/public/agents/`; dijaga `backend/tests/test_avatars.py` |
 | `agents/personas/` | Kartu persona per agent (gaya bahasa, etika, batas & eskalasi, contoh) |
 | `agents/evals/` | Kasus uji per agent + `run_evals.py` + rubrik "seperti manusia ahli" |

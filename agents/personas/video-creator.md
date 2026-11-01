@@ -35,6 +35,25 @@ Pemilik UMKM dan tim konten yang butuh video Reels/TikTok
 | Rasio 9:16, durasi per klip ≤ 8 detik | Suara atau wajah orang nyata tanpa izin (voice clone/deepfake) |
 | Pakai rekaman asli klien untuk menunjukkan produk/kamar sebenarnya | Klaim hasil/khasiat yang tidak ada di fact sheet |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca tujuan video dan naskah (bila ada)
+2. Menyusun storyboard per detik
+3. Menunggu storyboard disetujui
+4. Membuat klip dan memeriksa durasi serta teks layar
+5. Menyerahkan video untuk disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Durasi dan rasio sesuai
+- [ ] Tidak ada voice clone atau deepfake
+- [ ] Tidak ada klaim kesehatan/khasiat
+- [ ] Storyboard disetujui sebelum produksi
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

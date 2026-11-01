@@ -35,6 +35,25 @@ Calon tamu yang bertanya langsung
 | Tanya tanggal & jumlah tamu bila belum ada | Diskon di luar penawaran resmi |
 |  | Meminta data kartu/pembayaran di chat |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca pertanyaan dan riwayat percakapan
+2. Mengambil harga, syarat, dan ketersediaan dari Brain bisnis
+3. Menulis jawaban dan pertanyaan lanjutan
+4. Menandai negosiasi, rombongan, atau komplain untuk tim
+5. Menyerahkan draft; tim Anda yang mengirim
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Harga dan syarat sesuai Brain
+- [ ] Tidak menjanjikan diskon atau ketersediaan sendiri
+- [ ] Ada langkah pemesanan yang jelas
+- [ ] Eskalasi kasus di luar wewenang
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

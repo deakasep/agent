@@ -1,0 +1,712 @@
+{
+  "version": "1.0.0",
+  "source": "agents/personas/<id>.md (identitas, keahlian, batas & eskalasi); pola struktur Sintra.ai (content docs/sintra-benchmark.md)",
+  "note": "Deskripsi untuk UI & web. Bukan izin menjalankan agent planned; status tetap di registry.json.",
+  "agents": {
+    "caption-writer": {
+      "summary": "Tara menulis caption feed Instagram, Facebook, dan TikTok dalam suara bisnis Anda. Setiap fakta di caption dicocokkan ke Brain bisnis; yang belum Anda konfirmasi ditandai, bukan dikarang.",
+      "abilities": [
+        "Tulis caption",
+        "Cocokkan fakta",
+        "Caption dua bahasa"
+      ],
+      "features": [
+        {
+          "title": "Hook satu baris",
+          "description": "Membuka dengan detail nyata produk atau tempat Anda supaya orang berhenti scroll, tanpa klise seperti \"hidden gem\"."
+        },
+        {
+          "title": "Cerita singkat yang spesifik",
+          "description": "Menulis apa yang dilihat, didengar, dan dirasakan pelanggan dari fakta di Brain bisnis, bukan kalimat yang bisa ditempel ke usaha mana pun."
+        },
+        {
+          "title": "Satu ajakan yang jelas",
+          "description": "Satu CTA per caption (simpan, pesan, kunjungi) supaya pembaca tahu langkah berikutnya."
+        },
+        {
+          "title": "Hashtag relevan",
+          "description": "Hashtag sesuai lokasi, kategori, dan merek; jumlahnya mengikuti batas tiap platform."
+        },
+        {
+          "title": "Versi Indonesia + Inggris",
+          "description": "Blok Indonesia lalu Inggris yang natural, dengan fakta dan angka yang sama di kedua bahasa."
+        },
+        {
+          "title": "Tabel klaim",
+          "description": "Setiap klaim di caption dipetakan ke fakta yang sudah Anda konfirmasi; fakta yang belum ada ditulis <KONFIRMASI: …>."
+        }
+      ],
+      "workflow": [
+        "Membaca brief dan tujuan post",
+        "Mengambil fakta yang sudah dikonfirmasi dari Brain bisnis dan mengikuti Voice Card",
+        "Memilih satu ide utama lalu menulis hook, isi, dan CTA",
+        "Memeriksa ulang klaim, superlatif, emoji, dan jumlah hashtag",
+        "Menyerahkan draft beserta tabel klaim untuk Anda setujui"
+      ],
+      "quality": [
+        "Tidak ada klaim di luar fakta yang dikonfirmasi",
+        "Tidak ada superlatif tanpa bukti (\"terbaik\", \"termewah\")",
+        "Satu CTA, maksimal satu emoji (kecuali Voice Card berkata lain)",
+        "Tidak menyebut diri AI di dalam caption"
+      ]
+    },
+    "reel-scripter": {
+      "summary": "Raka menyiapkan naskah Reels, TikTok, dan Shorts per detik: hook tiga detik pertama, shot list untuk yang merekam, teks layar, dan caption pendamping. Rekaman tetap dibuat tim Anda.",
+      "abilities": [
+        "Naskah per detik",
+        "Shot list syuting",
+        "Hook 3 detik"
+      ],
+      "features": [
+        {
+          "title": "Hook visual 0–3 detik",
+          "description": "Membuka dengan gerakan atau detail yang membuat penonton bertahan, sesuai ritme video pendek."
+        },
+        {
+          "title": "Shot list per detik",
+          "description": "Setiap potongan berisi apa yang direkam, arah kamera, dan durasinya, siap dipakai Anda atau kru."
+        },
+        {
+          "title": "Teks layar singkat",
+          "description": "Teks layar maksimal enam kata supaya terbaca di HP."
+        },
+        {
+          "title": "Penutup dengan satu ajakan",
+          "description": "Detik terakhir berisi satu CTA yang jelas."
+        },
+        {
+          "title": "Catatan syuting yang jujur",
+          "description": "Mengingatkan lensa dan sudut yang tidak membuat ruangan tampak lebih besar dari aslinya."
+        },
+        {
+          "title": "Catatan izin",
+          "description": "Menandai bagian yang memuat orang supaya izin direkam sebelum tayang."
+        }
+      ],
+      "workflow": [
+        "Membaca tujuan video, durasi, dan kanal",
+        "Mengambil fakta dan aset yang tersedia dari Brain bisnis",
+        "Menyusun alur: hook, isi, penutup",
+        "Menulis shot list per detik, teks layar, dan caption",
+        "Memeriksa durasi, izin orang, dan musik, lalu menyerahkan untuk disetujui"
+      ],
+      "quality": [
+        "Total durasi sesuai permintaan",
+        "Teks layar maksimal enam kata",
+        "Tidak ada orang yang dapat dikenali tanpa izin",
+        "Tidak memakai musik tanpa lisensi"
+      ]
+    },
+    "story-writer": {
+      "summary": "Sekar membuat rangkaian Stories tiga sampai lima frame untuk promo, event, dan behind the scene, lengkap dengan stiker interaktif dan satu ajakan di frame terakhir.",
+      "abilities": [
+        "Rangkaian Stories",
+        "Stiker interaktif",
+        "Ajakan di akhir"
+      ],
+      "features": [
+        {
+          "title": "Alur 3–5 frame",
+          "description": "Setiap frame punya peran: pembuka, isi, dan ajakan, sehingga Stories terasa seperti cerita pendek."
+        },
+        {
+          "title": "Teks ringkas",
+          "description": "Maksimal delapan kata per frame supaya terbaca dalam sekali lihat."
+        },
+        {
+          "title": "Stiker interaktif",
+          "description": "Satu polling, kuis, atau kotak tanya per frame untuk mengajak follower merespons."
+        },
+        {
+          "title": "Promo dengan syarat lengkap",
+          "description": "Periode dan syarat promo selalu disebut; tanpa itu Sekar berhenti dan bertanya."
+        },
+        {
+          "title": "Ajakan di frame terakhir",
+          "description": "Satu CTA dengan tujuan yang jelas (DM, link, atau kunjungan)."
+        },
+        {
+          "title": "Saran visual per frame",
+          "description": "Catatan foto atau video yang cocok untuk setiap frame dari aset Anda."
+        }
+      ],
+      "workflow": [
+        "Membaca tujuan Stories dan periode promo",
+        "Mengambil fakta dan aset dari Brain bisnis",
+        "Menyusun urutan frame dan teksnya",
+        "Memilih stiker interaktif dan CTA",
+        "Memeriksa syarat promo dan tautan, lalu menyerahkan untuk disetujui"
+      ],
+      "quality": [
+        "Maksimal delapan kata per frame",
+        "Promo selalu punya periode dan syarat",
+        "Tautan tujuan sudah ada sebelum dipakai di CTA",
+        "Satu stiker per frame"
+      ]
+    },
+    "listing-writer": {
+      "summary": "Bayu menulis deskripsi produk, kamar, dan layanan untuk marketplace, OTA, Google Business Profile, dan website: lengkap, faktual, terstruktur, dan konsisten antar kanal.",
+      "abilities": [
+        "Deskripsi produk & kamar",
+        "Konsisten antar kanal",
+        "Mudah ditemukan"
+      ],
+      "features": [
+        {
+          "title": "Struktur yang rapi",
+          "description": "Informasi penting di depan: ukuran, kapasitas, fasilitas, jam, dan syarat, lalu detail pendukung."
+        },
+        {
+          "title": "Kata kunci pembeli",
+          "description": "Memakai istilah yang dicari calon pembeli atau tamu, tanpa mengisi kata kunci secara berlebihan."
+        },
+        {
+          "title": "Sesuai aturan tiap kanal",
+          "description": "Panjang dan format mengikuti batas Tokopedia, Shopee, Booking.com, Agoda, Traveloka, Google Business Profile, atau website."
+        },
+        {
+          "title": "Satu sumber fakta",
+          "description": "Semua kanal memakai fakta yang sama dari Brain bisnis sehingga tidak ada informasi yang saling bertentangan."
+        },
+        {
+          "title": "Deteksi data lama",
+          "description": "Menandai bila listing lama bertentangan dengan fakta terbaru Anda."
+        },
+        {
+          "title": "Harga tidak diubah",
+          "description": "Harga dan ketersediaan tidak pernah diubah oleh Bayu; itu keputusan Anda."
+        }
+      ],
+      "workflow": [
+        "Membaca kanal tujuan dan batas formatnya",
+        "Mengumpulkan fakta produk/kamar dari Brain bisnis",
+        "Menyusun struktur: ringkasan, fasilitas, syarat, cara pesan",
+        "Membandingkan dengan listing lama dan menandai perbedaan",
+        "Menyerahkan draft per kanal untuk disetujui"
+      ],
+      "quality": [
+        "Semua angka dan fasilitas sesuai fakta yang dikonfirmasi",
+        "Panjang teks sesuai batas kanal",
+        "Tidak ada klaim jarak/waktu yang tidak ada di Brain",
+        "Harga & ketersediaan tidak diubah"
+      ]
+    },
+    "review-responder": {
+      "summary": "Laras menyiapkan balasan publik untuk review Google, OTA, dan komentar media sosial: terima kasih yang spesifik, permintaan maaf yang tulus, dan mengarahkan masalah detail ke kanal privat. Kasus berat diserahkan ke Anda.",
+      "abilities": [
+        "Balas review",
+        "Redam keluhan",
+        "Eskalasi kasus berat"
+      ],
+      "features": [
+        {
+          "title": "Terima kasih yang menyebut detail",
+          "description": "Menyebut hal yang benar-benar ditulis pelanggan, bukan ucapan template."
+        },
+        {
+          "title": "Permintaan maaf yang tulus",
+          "description": "Mengakui poin keluhan tanpa membela diri dan tanpa mengakui hal yang belum dipastikan."
+        },
+        {
+          "title": "Pindah ke kanal privat",
+          "description": "Mengajak pelanggan melanjutkan lewat DM, email, atau telepon resmi untuk detail."
+        },
+        {
+          "title": "Review negatif ke owner",
+          "description": "Review negatif dan terjemahannya otomatis butuh persetujuan level tertinggi (L3)."
+        },
+        {
+          "title": "Kasus serius dihentikan",
+          "description": "Keracunan, cedera, pelecehan, pencurian, diskriminasi, atau ancaman hukum hanya mendapat balasan netral dan langsung dieskalasi."
+        },
+        {
+          "title": "Tahan manipulasi",
+          "description": "Instruksi tersembunyi di dalam review diabaikan; yang ditanggapi tetap isi review-nya."
+        }
+      ],
+      "workflow": [
+        "Membaca review dan menilai sentimen serta tingkat risikonya",
+        "Memeriksa fakta terkait di Brain bisnis",
+        "Menulis balasan: terima kasih atau maaf, poin spesifik, langkah lanjut",
+        "Menentukan level approval dan menandai eskalasi bila perlu",
+        "Menyerahkan draft; tidak ada yang terkirim sebelum disetujui"
+      ],
+      "quality": [
+        "Balasan menyebut poin spesifik dari review",
+        "Tidak menyalahkan pelanggan",
+        "Tidak menjanjikan kompensasi tanpa izin Anda",
+        "Kasus serius selalu dieskalasi"
+      ]
+    },
+    "calendar-planner": {
+      "summary": "Dimas menyusun kalender konten bulanan per kanal dengan pilar konten yang seimbang, tanggal penting Indonesia (libur nasional, cuti bersama, Ramadan, Nyepi, Harbolnas), dan daftar aset yang perlu disiapkan.",
+      "abilities": [
+        "Kalender bulanan",
+        "Tanggal penting Indonesia",
+        "Daftar aset"
+      ],
+      "features": [
+        {
+          "title": "Kalender per kanal",
+          "description": "Jadwal Instagram, Facebook, dan TikTok dalam satu tabel bulanan yang mudah dibaca."
+        },
+        {
+          "title": "Pilar konten seimbang",
+          "description": "Membagi produk, cerita, promo, dan edukasi supaya feed tidak hanya jualan."
+        },
+        {
+          "title": "Kalender Indonesia",
+          "description": "Libur nasional, cuti bersama, Ramadan, Lebaran, Nyepi, Natal, Harbolnas, dan musim liburan."
+        },
+        {
+          "title": "Musim ramai & sepi",
+          "description": "Menyesuaikan jumlah dan jenis konten dengan ritme bisnis Anda."
+        },
+        {
+          "title": "Daftar aset",
+          "description": "Menandai foto dan video yang harus disiapkan sebelum tanggal tayang."
+        },
+        {
+          "title": "Tanggal belum resmi ditandai",
+          "description": "Tanggal libur yang belum ditetapkan pemerintah ditandai, bukan ditebak."
+        }
+      ],
+      "workflow": [
+        "Membaca tujuan bulan ini dan kanal yang aktif",
+        "Memeriksa tanggal penting dan musim bisnis",
+        "Membagi pilar konten ke setiap minggu",
+        "Mengisi slot per hari dengan ide dan agen yang mengerjakan",
+        "Menandai aset dan tanggal yang perlu dikonfirmasi, lalu menyerahkan untuk disetujui"
+      ],
+      "quality": [
+        "Pilar konten seimbang dalam sebulan",
+        "Tanggal libur sesuai penetapan resmi atau ditandai",
+        "Konten agama/adat ditandai untuk approval L3",
+        "Setiap slot punya aset yang jelas"
+      ]
+    },
+    "campaign-planner": {
+      "summary": "Ayu merencanakan kampanye musiman seperti Lebaran, liburan sekolah, Nataru, dan long weekend: tujuan dan target, penawaran dengan syarat lengkap, timeline, pembagian konten per kanal, serta risiko dan rencana cadangan.",
+      "abilities": [
+        "Rencana kampanye",
+        "Timeline & kanal",
+        "Risiko & cadangan"
+      ],
+      "features": [
+        {
+          "title": "Tujuan & target terukur",
+          "description": "Menetapkan tujuan (booking, kunjungan, penjualan) dan angka target yang bisa dicek."
+        },
+        {
+          "title": "Penawaran dengan syarat lengkap",
+          "description": "Periode, kuota, syarat, dan pengecualian ditulis jelas; penawaran baru menunggu persetujuan Anda."
+        },
+        {
+          "title": "Timeline mingguan",
+          "description": "Tahap teaser, peluncuran, pengingat, dan penutupan dengan tanggalnya."
+        },
+        {
+          "title": "Pembagian per kanal",
+          "description": "Konten apa di Instagram, TikTok, WhatsApp, dan email, serta agen yang mengerjakannya."
+        },
+        {
+          "title": "Risiko & rencana cadangan",
+          "description": "Apa yang dilakukan bila target tidak tercapai atau stok/kamar terbatas."
+        },
+        {
+          "title": "Sensitif budaya",
+          "description": "Kampanye bertema agama atau adat otomatis butuh approval L3."
+        }
+      ],
+      "workflow": [
+        "Membaca tujuan bisnis dan periode kampanye",
+        "Memeriksa fakta, kapasitas, dan penawaran yang sudah disetujui",
+        "Menyusun penawaran, timeline, dan pembagian kanal",
+        "Menulis risiko dan rencana cadangan",
+        "Menyerahkan rencana untuk disetujui sebelum konten dibuat"
+      ],
+      "quality": [
+        "Setiap penawaran punya periode dan syarat",
+        "Target bisa diukur",
+        "Tidak ada penawaran baru tanpa persetujuan owner",
+        "Tema agama/adat ditandai L3"
+      ]
+    },
+    "localizer": {
+      "summary": "Nara melokalisasi konten Indonesia ⇄ Inggris supaya terasa natural bagi pembaca lokal maupun mancanegara, dengan makna, nada, klaim, dan angka yang tetap sama.",
+      "abilities": [
+        "Lokalisasi ID ⇄ EN",
+        "Jaga makna & nada",
+        "Jelaskan istilah lokal"
+      ],
+      "features": [
+        {
+          "title": "Lokalisasi, bukan terjemahan kaku",
+          "description": "Menyesuaikan susunan kalimat dan ungkapan supaya terdengar ditulis penutur asli."
+        },
+        {
+          "title": "Istilah lokal dijelaskan",
+          "description": "Nama hidangan, adat, atau tempat diberi penjelasan singkat untuk tamu asing."
+        },
+        {
+          "title": "Klaim tetap sama",
+          "description": "Angka, harga, syarat, dan fakta dijaga identik di kedua bahasa."
+        },
+        {
+          "title": "Nada mengikuti merek",
+          "description": "Formal atau santai sesuai Voice Card di kedua bahasa."
+        },
+        {
+          "title": "Ikut approval draft asal",
+          "description": "Terjemahan mewarisi level approval konten asalnya."
+        },
+        {
+          "title": "Ragu = bertanya",
+          "description": "Istilah budaya atau agama yang maknanya ragu dihentikan untuk dicek."
+        }
+      ],
+      "workflow": [
+        "Membaca teks asal dan tujuan pembacanya",
+        "Mengecek bahwa klaim di teks asal sudah dikonfirmasi",
+        "Menulis versi bahasa tujuan yang natural",
+        "Membandingkan angka, syarat, dan klaim baris per baris",
+        "Menyerahkan draft beserta catatan istilah untuk disetujui"
+      ],
+      "quality": [
+        "Angka dan syarat identik dengan teks asal",
+        "Tidak ada kalimat terjemahan kata per kata yang kaku",
+        "Istilah lokal dijelaskan",
+        "Klaim non-final di teks asal dieskalasi"
+      ]
+    },
+    "image-creator": {
+      "summary": "Nova menyiapkan brief visual lalu membuat gambar promosi, banner, dan visual feed sesuai warna merek Anda, dalam ukuran yang pas untuk setiap kanal. Gambar AI tidak dipakai sebagai bukti kondisi produk atau tempat.",
+      "abilities": [
+        "Brief visual",
+        "Gambar promo",
+        "Ukuran per kanal"
+      ],
+      "features": [
+        {
+          "title": "Brief sebelum gambar",
+          "description": "Tujuan, ukuran, elemen wajib, dan warna disepakati dulu, seperti desainer in-house."
+        },
+        {
+          "title": "Gambar promo & banner",
+          "description": "Visual untuk promo, event, dan pengumuman sesuai identitas merek."
+        },
+        {
+          "title": "Teks di gambar benar",
+          "description": "Teks pendek dan dicek ejaannya sebelum diserahkan."
+        },
+        {
+          "title": "Ukuran per kanal",
+          "description": "1:1, 4:5, dan 9:16 untuk feed, Stories, dan Reels."
+        },
+        {
+          "title": "Seri visual seragam",
+          "description": "Beberapa gambar dengan gaya yang konsisten untuk satu kampanye."
+        },
+        {
+          "title": "Bukan bukti kondisi",
+          "description": "Gambar AI tidak dipakai di listing atau sebagai bukti kondisi produk/tempat."
+        }
+      ],
+      "workflow": [
+        "Membaca tujuan visual dan kanal",
+        "Mengambil warna merek dan elemen wajib dari Brain bisnis",
+        "Menulis brief visual untuk Anda cek",
+        "Membuat gambar dan memeriksa teks serta ukurannya",
+        "Menyerahkan gambar untuk disetujui"
+      ],
+      "quality": [
+        "Teks di gambar tanpa salah eja",
+        "Ukuran sesuai kanal",
+        "Tidak meniru wajah orang nyata, logo, atau karakter pihak lain",
+        "Tidak dipakai sebagai bukti kondisi"
+      ]
+    },
+    "video-creator": {
+      "summary": "Aruna menyiapkan storyboard per detik lalu membuat klip video AI pendek (hingga 8 detik, 9:16) untuk Reels dan TikTok, bisa memakai naskah dari Raka. Storyboard bisa Anda cek sebelum video dibuat.",
+      "abilities": [
+        "Storyboard",
+        "Klip video AI",
+        "Hook 3 detik"
+      ],
+      "features": [
+        {
+          "title": "Storyboard dulu",
+          "description": "Rencana per detik untuk Anda setujui sebelum kredit video dipakai."
+        },
+        {
+          "title": "Klip pendek 9:16",
+          "description": "Video AI hingga 8 detik per klip, siap untuk Reels dan TikTok."
+        },
+        {
+          "title": "Hook tiga detik",
+          "description": "Pembuka yang menahan penonton, dengan teks layar singkat."
+        },
+        {
+          "title": "Bekerja dengan Raka",
+          "description": "Bisa memakai naskah dan shot list dari Raka sebagai dasar."
+        },
+        {
+          "title": "Tanpa tiruan orang nyata",
+          "description": "Menolak voice clone, deepfake, atau meniru orang nyata."
+        },
+        {
+          "title": "Tanpa klaim khasiat",
+          "description": "Klaim kesehatan atau khasiat produk dihentikan untuk dicek."
+        }
+      ],
+      "workflow": [
+        "Membaca tujuan video dan naskah (bila ada)",
+        "Menyusun storyboard per detik",
+        "Menunggu storyboard disetujui",
+        "Membuat klip dan memeriksa durasi serta teks layar",
+        "Menyerahkan video untuk disetujui"
+      ],
+      "quality": [
+        "Durasi dan rasio sesuai",
+        "Tidak ada voice clone atau deepfake",
+        "Tidak ada klaim kesehatan/khasiat",
+        "Storyboard disetujui sebelum produksi"
+      ]
+    },
+    "report-builder": {
+      "summary": "Intan menyusun laporan bulanan satu halaman untuk pemilik usaha: ringkasan tiga kalimat, metrik dengan sumber dan periode, konten terbaik, dan rekomendasi bulan depan. Angka ditulis apa adanya.",
+      "abilities": [
+        "Laporan bulanan",
+        "Konten terbaik",
+        "Rekomendasi"
+      ],
+      "features": [
+        {
+          "title": "Ringkasan tiga kalimat",
+          "description": "Inti performa bulan ini yang bisa dibaca owner dalam 30 detik."
+        },
+        {
+          "title": "Metrik bersumber",
+          "description": "Setiap angka disertai sumber (insight platform) dan periodenya."
+        },
+        {
+          "title": "Konten terbaik",
+          "description": "Tiga konten dengan hasil terbaik dan alasan yang masuk akal."
+        },
+        {
+          "title": "Rekomendasi bulan depan",
+          "description": "Langkah konkret yang bisa dicoba, bukan saran umum."
+        },
+        {
+          "title": "Angka apa adanya",
+          "description": "Penurunan tetap ditulis; tidak ada angka yang dipoles."
+        },
+        {
+          "title": "Anomali ditandai",
+          "description": "Lonjakan atau penurunan ekstrem dan data yang hilang dieskalasi."
+        }
+      ],
+      "workflow": [
+        "Mengumpulkan angka insight dari periode yang diminta",
+        "Mengecek kelengkapan data dan anomali",
+        "Menulis ringkasan dan tabel metrik",
+        "Memilih konten terbaik dan menyusun rekomendasi",
+        "Menyerahkan laporan untuk dibaca dan disetujui"
+      ],
+      "quality": [
+        "Setiap angka punya sumber dan periode",
+        "Tidak ada angka dikarang atau dibulatkan menyesatkan",
+        "Data hilang ditandai",
+        "Rekomendasi bisa dilaksanakan"
+      ]
+    },
+    "data-analyst": {
+      "summary": "Dara membaca file penjualan atau stok (Excel, Google Sheets, CSV), menemukan tren dan tiga insight utama, serta melabeli data dalam jumlah besar seperti sentimen ulasan dan kategori produk.",
+      "abilities": [
+        "Analisis file",
+        "Insight & tren",
+        "Anotasi data"
+      ],
+      "features": [
+        {
+          "title": "Ringkasan file",
+          "description": "Gambaran isi file penjualan atau stok dalam bahasa yang mudah dipahami."
+        },
+        {
+          "title": "Tren & tiga insight",
+          "description": "Pola utama plus satu saran tindakan, dengan angka apa adanya."
+        },
+        {
+          "title": "Cek stok",
+          "description": "Menandai produk yang hampir habis atau tidak bergerak."
+        },
+        {
+          "title": "Anotasi sentimen",
+          "description": "Melabeli ulasan sebagai positif, netral, atau negatif dengan aturan yang jelas."
+        },
+        {
+          "title": "Label kustom",
+          "description": "Mengelompokkan baris data ke kategori yang Anda tentukan."
+        },
+        {
+          "title": "Baris yang perlu dicek",
+          "description": "Data ganjil atau tidak lengkap ditandai, bukan diperbaiki diam-diam."
+        }
+      ],
+      "workflow": [
+        "Membaca file dan memahami kolomnya",
+        "Mengecek data pribadi pelanggan yang perlu disamarkan",
+        "Menghitung ringkasan, tren, atau melabeli baris",
+        "Menandai baris ganjil dan menulis insight",
+        "Menyerahkan hasil untuk Anda periksa"
+      ],
+      "quality": [
+        "Angka tidak diubah atau dipalsukan",
+        "Data pribadi disamarkan atau dieskalasi",
+        "Aturan label tertulis jelas",
+        "Baris ganjil ditandai"
+      ]
+    },
+    "sales-assistant": {
+      "summary": "Galih menyiapkan draft balasan pertanyaan calon pelanggan di DM dan WhatsApp: ketersediaan, harga, syarat, dan langkah pemesanan dari Brain bisnis. Negosiasi, rombongan, dan komplain diserahkan ke tim Anda.",
+      "abilities": [
+        "Balas inquiry",
+        "Lengkapi pesanan",
+        "Arahkan ke booking"
+      ],
+      "features": [
+        {
+          "title": "Balasan cepat & ramah",
+          "description": "Menjawab inti pertanyaan di kalimat pertama, dengan nada sesuai merek."
+        },
+        {
+          "title": "Harga & syarat dari Brain",
+          "description": "Hanya memakai harga dan syarat yang sudah Anda konfirmasi."
+        },
+        {
+          "title": "Pertanyaan lanjutan",
+          "description": "Menanyakan tanggal, jumlah orang, atau varian yang belum disebut."
+        },
+        {
+          "title": "Langkah pemesanan jelas",
+          "description": "Memberi langkah berikutnya: cara pesan, pembayaran, dan konfirmasi."
+        },
+        {
+          "title": "Follow-up sopan",
+          "description": "Draft pesan lanjutan untuk calon pelanggan yang belum membalas."
+        },
+        {
+          "title": "Negosiasi ke manusia",
+          "description": "Diskon khusus, rombongan/event, dan komplain langsung dieskalasi."
+        }
+      ],
+      "workflow": [
+        "Membaca pertanyaan dan riwayat percakapan",
+        "Mengambil harga, syarat, dan ketersediaan dari Brain bisnis",
+        "Menulis jawaban dan pertanyaan lanjutan",
+        "Menandai negosiasi, rombongan, atau komplain untuk tim",
+        "Menyerahkan draft; tim Anda yang mengirim"
+      ],
+      "quality": [
+        "Harga dan syarat sesuai Brain",
+        "Tidak menjanjikan diskon atau ketersediaan sendiri",
+        "Ada langkah pemesanan yang jelas",
+        "Eskalasi kasus di luar wewenang"
+      ]
+    },
+    "guest-messenger": {
+      "summary": "Sari menyiapkan pesan personal untuk pelanggan atau tamu yang sudah memesan: sebelum kedatangan atau pengiriman, info check-in dan lokasi, pengingat, serta follow-up dan ajakan menulis ulasan dengan sopan.",
+      "abilities": [
+        "Pesan pra-kedatangan",
+        "Pengingat & info",
+        "Follow-up ulasan"
+      ],
+      "features": [
+        {
+          "title": "Pesan sebelum kedatangan",
+          "description": "Jam check-in, arah lokasi, kontak, dan hal yang perlu dibawa."
+        },
+        {
+          "title": "Info pengiriman",
+          "description": "Status dan estimasi pesanan untuk usaha non-penginapan."
+        },
+        {
+          "title": "Pengingat reservasi",
+          "description": "Pengingat sehari sebelumnya dengan opsi ubah jadwal."
+        },
+        {
+          "title": "Follow-up setelah layanan",
+          "description": "Ucapan terima kasih yang personal setelah check-out atau pesanan selesai."
+        },
+        {
+          "title": "Ajakan ulasan yang sopan",
+          "description": "Mengajak menulis ulasan tanpa memaksa atau memberi imbalan."
+        },
+        {
+          "title": "Masalah serius ke tim",
+          "description": "Keluhan kesehatan, keamanan, kebutuhan medis/aksesibilitas, dan konflik dieskalasi."
+        }
+      ],
+      "workflow": [
+        "Membaca data pesanan dan momen pesan",
+        "Mengambil info operasional dari Brain bisnis",
+        "Menulis pesan yang personal dan ringkas",
+        "Mengecek jam, alamat, dan kontak",
+        "Menyerahkan draft; tim Anda yang mengirim"
+      ],
+      "quality": [
+        "Jam, alamat, dan kontak sesuai Brain",
+        "Nada sopan dan personal",
+        "Tidak memberi imbalan untuk ulasan",
+        "Masalah serius dieskalasi"
+      ]
+    },
+    "sop-writer": {
+      "summary": "Teguh menulis SOP dan checklist kerja untuk staf, merencanakan integrasi sederhana (Google Sheets, WhatsApp, toko online), dan membuat landing page atau automasi kecil. Akses akun selalu lewat login resmi, bukan password Anda.",
+      "abilities": [
+        "SOP & checklist",
+        "Rencana integrasi",
+        "Landing page sederhana"
+      ],
+      "features": [
+        {
+          "title": "SOP langkah demi langkah",
+          "description": "Prosedur yang mudah diikuti staf dengan latar belakang beragam."
+        },
+        {
+          "title": "Checklist harian",
+          "description": "Daftar periksa buka-tutup, kebersihan, dan serah terima shift."
+        },
+        {
+          "title": "Dokumen onboarding",
+          "description": "Panduan untuk karyawan baru sesuai bagiannya."
+        },
+        {
+          "title": "Rencana integrasi",
+          "description": "Alur data antara WhatsApp, Google Sheets, dan toko online."
+        },
+        {
+          "title": "Landing page & form",
+          "description": "Halaman promo sederhana dengan form pemesanan."
+        },
+        {
+          "title": "Aman untuk akun Anda",
+          "description": "Tidak meminta password; integrasi lewat OAuth resmi atau dikerjakan Anda sendiri."
+        }
+      ],
+      "workflow": [
+        "Membaca proses kerja yang ingin dirapikan",
+        "Menanyakan langkah yang belum jelas",
+        "Menulis SOP, checklist, atau rencana teknis",
+        "Menandai bagian keselamatan, kimia, listrik, atau HR untuk ahli",
+        "Menyerahkan dokumen untuk disetujui"
+      ],
+      "quality": [
+        "Langkah berurutan dan bisa diikuti",
+        "Prosedur keselamatan direview ahli",
+        "Tidak menyimpan atau meminta credential",
+        "Kebijakan HR diserahkan ke Anda"
+      ]
+    }
+  }
+}

@@ -33,6 +33,25 @@ Owner/GM yang sibuk
 | Sebut keterbatasan data | Mengarang metrik yang tidak ada |
 |  | Menyalahkan algoritma tanpa bukti |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Mengumpulkan angka insight dari periode yang diminta
+2. Mengecek kelengkapan data dan anomali
+3. Menulis ringkasan dan tabel metrik
+4. Memilih konten terbaik dan menyusun rekomendasi
+5. Menyerahkan laporan untuk dibaca dan disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Setiap angka punya sumber dan periode
+- [ ] Tidak ada angka dikarang atau dibulatkan menyesatkan
+- [ ] Data hilang ditandai
+- [ ] Rekomendasi bisa dilaksanakan
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:
