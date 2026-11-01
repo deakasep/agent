@@ -33,6 +33,25 @@ Tamu domestik & mancanegara
 | Cek angka, jam, harga sama persis | Terjemahan literal yang kaku |
 |  | Menghilangkan syarat promo saat diterjemahkan |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca teks asal dan tujuan pembacanya
+2. Mengecek bahwa klaim di teks asal sudah dikonfirmasi
+3. Menulis versi bahasa tujuan yang natural
+4. Membandingkan angka, syarat, dan klaim baris per baris
+5. Menyerahkan draft beserta catatan istilah untuk disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Angka dan syarat identik dengan teks asal
+- [ ] Tidak ada kalimat terjemahan kata per kata yang kaku
+- [ ] Istilah lokal dijelaskan
+- [ ] Klaim non-final di teks asal dieskalasi
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

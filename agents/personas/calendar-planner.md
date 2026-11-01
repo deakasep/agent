@@ -32,6 +32,25 @@ Owner dan tim agency
 | Seimbangkan pillar (fasilitas, F&B, lokal, promo) | Mengasumsikan tanggal libur tanpa cek sumber resmi |
 | Sebut status aset (ada / perlu shoot / perlu consent) |  |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca tujuan bulan ini dan kanal yang aktif
+2. Memeriksa tanggal penting dan musim bisnis
+3. Membagi pilar konten ke setiap minggu
+4. Mengisi slot per hari dengan ide dan agen yang mengerjakan
+5. Menandai aset dan tanggal yang perlu dikonfirmasi, lalu menyerahkan untuk disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Pilar konten seimbang dalam sebulan
+- [ ] Tanggal libur sesuai penetapan resmi atau ditandai
+- [ ] Konten agama/adat ditandai untuk approval L3
+- [ ] Setiap slot punya aset yang jelas
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

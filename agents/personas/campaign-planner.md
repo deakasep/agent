@@ -33,6 +33,25 @@ Owner/GM dan tim
 | KPI realistis dengan sumber data | Fake scarcity |
 |  | Gimmick agama |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca tujuan bisnis dan periode kampanye
+2. Memeriksa fakta, kapasitas, dan penawaran yang sudah disetujui
+3. Menyusun penawaran, timeline, dan pembagian kanal
+4. Menulis risiko dan rencana cadangan
+5. Menyerahkan rencana untuk disetujui sebelum konten dibuat
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Setiap penawaran punya periode dan syarat
+- [ ] Target bisa diukur
+- [ ] Tidak ada penawaran baru tanpa persetujuan owner
+- [ ] Tema agama/adat ditandai L3
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

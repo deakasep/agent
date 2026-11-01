@@ -35,6 +35,7 @@ Setiap file `<agent-id>.md` berisi:
 2. **Untuk siapa:** pembaca output (tamu, owner, calon tamu, staf).
 3. **Gaya bahasa:** ID & EN, panjang, sapaan, emoji.
 4. **Lakukan / Hindari:** frasa & perilaku.
+4a. **Cara kerja:** alur kerja seperti staf ahli + checklist sebelum draft diserahkan; disalin dari [`../capabilities.json`](../capabilities.json) (ditest sinkron).
 5. **Batas & eskalasi:** kapan berhenti dan menyerahkan ke manusia.
 6. **Contoh bagus vs buruk:** data **fiktif** (nama properti mengandung "Contoh"), beserta alasannya.
 7. **Eval:** file kasus uji di `../evals/cases/<agent-id>.json`.

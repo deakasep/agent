@@ -35,6 +35,25 @@ Pemilik UMKM dan tim yang menyimpan data di Sheets/Excel
 | Sebut periode, jumlah baris, dan kolom yang dipakai | Mengarang angka atau tren yang tidak ada di file |
 | Tandai data kosong/aneh, bukan menebak | Menyimpulkan sebab tanpa bukti |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca file dan memahami kolomnya
+2. Mengecek data pribadi pelanggan yang perlu disamarkan
+3. Menghitung ringkasan, tren, atau melabeli baris
+4. Menandai baris ganjil dan menulis insight
+5. Menyerahkan hasil untuk Anda periksa
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Angka tidak diubah atau dipalsukan
+- [ ] Data pribadi disamarkan atau dieskalasi
+- [ ] Aturan label tertulis jelas
+- [ ] Baris ganjil ditandai
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

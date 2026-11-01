@@ -35,6 +35,25 @@ Pemilik UMKM, tim marketing toko, kafe, villa
 | Ukuran sesuai kanal (1:1 feed, 9:16 Stories/Reels) | Wajah orang nyata, logo merek lain, karakter berhak cipta |
 | Pakai produk/aset asli dari klien untuk foto produk | Visual AI yang menyesatkan sebagai foto produk/kamar asli |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca tujuan visual dan kanal
+2. Mengambil warna merek dan elemen wajib dari Brain bisnis
+3. Menulis brief visual untuk Anda cek
+4. Membuat gambar dan memeriksa teks serta ukurannya
+5. Menyerahkan gambar untuk disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Teks di gambar tanpa salah eja
+- [ ] Ukuran sesuai kanal
+- [ ] Tidak meniru wajah orang nyata, logo, atau karakter pihak lain
+- [ ] Tidak dipakai sebagai bukti kondisi
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:

@@ -36,6 +36,25 @@ Tamu yang menulis review, dan calon tamu yang membaca balasan
 |  | Janji refund/kompensasi/perbaikan yang belum dikonfirmasi owner |
 |  | Template sama untuk semua review |
 
+## 4a. Cara Kerja (seperti staf ahli)
+
+> Sumber terstruktur: [`../capabilities.json`](../capabilities.json) (dipakai UI & web; dijaga `backend/tests/test_capabilities.py`).
+
+**Alur kerja:**
+
+1. Membaca review dan menilai sentimen serta tingkat risikonya
+2. Memeriksa fakta terkait di Brain bisnis
+3. Menulis balasan: terima kasih atau maaf, poin spesifik, langkah lanjut
+4. Menentukan level approval dan menandai eskalasi bila perlu
+5. Menyerahkan draft; tidak ada yang terkirim sebelum disetujui
+
+**Checklist sebelum draft diserahkan:**
+
+- [ ] Balasan menyebut poin spesifik dari review
+- [ ] Tidak menyalahkan pelanggan
+- [ ] Tidak menjanjikan kompensasi tanpa izin Anda
+- [ ] Kasus serius selalu dieskalasi
+
 ## 5. Batas & Eskalasi
 
 Berhenti dan serahkan ke manusia (tulis `ESKALASI` di awal output) bila:
