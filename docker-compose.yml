@@ -84,6 +84,8 @@ services:
       CLAU_AI_PROVIDER: ${CLAU_AI_PROVIDER:-fake}
       CLAU_AI_INTENTS: ${CLAU_AI_INTENTS:-caption}
       CLAU_AI_JOB_ESTIMATE_MICRO_USD: ${CLAU_AI_JOB_ESTIMATE_MICRO_USD:-}
+      CLAU_AI_PRICE_INPUT_MICRO_USD: ${CLAU_AI_PRICE_INPUT_MICRO_USD:-}
+      CLAU_AI_PRICE_OUTPUT_MICRO_USD: ${CLAU_AI_PRICE_OUTPUT_MICRO_USD:-}
       # Langganan & kredit (api-contracts 0.11.0): fake = mode uji; midtrans butuh server key (secret, .env 600).
       CLAU_PAYMENT_PROVIDER: ${CLAU_PAYMENT_PROVIDER:-fake}
       CLAU_MIDTRANS_SERVER_KEY: ${CLAU_MIDTRANS_SERVER_KEY:-}
@@ -120,8 +122,17 @@ services:
       CLAU_AI_PROVIDER: ${CLAU_AI_PROVIDER:-fake}
       CLAU_AI_INTENTS: ${CLAU_AI_INTENTS:-caption}
       CLAU_AI_JOB_ESTIMATE_MICRO_USD: ${CLAU_AI_JOB_ESTIMATE_MICRO_USD:-}
+      CLAU_AI_PRICE_INPUT_MICRO_USD: ${CLAU_AI_PRICE_INPUT_MICRO_USD:-}
+      CLAU_AI_PRICE_OUTPUT_MICRO_USD: ${CLAU_AI_PRICE_OUTPUT_MICRO_USD:-}
       CLAU_AI_WORKER_TIMEOUT_S: ${CLAU_AI_WORKER_TIMEOUT_S:-}
       CLAU_AI_POLL_INTERVAL_S: ${CLAU_AI_POLL_INTERVAL_S:-}
+      # Provider claude: kunci API hanya di container ini (backend tidak memegangnya).
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CLAU_AI_MODEL: ${CLAU_AI_MODEL:-}
+      CLAU_AI_MODEL_RINGAN: ${CLAU_AI_MODEL_RINGAN:-}
+      CLAU_AI_MODEL_PRO: ${CLAU_AI_MODEL_PRO:-}
+      CLAU_AI_MAX_OUTPUT_TOKENS: ${CLAU_AI_MAX_OUTPUT_TOKENS:-}
+      CLAU_AI_CALL_TIMEOUT_S: ${CLAU_AI_CALL_TIMEOUT_S:-}
     tmpfs: [/tmp]
     depends_on:
       migrate: { condition: service_completed_successfully }
