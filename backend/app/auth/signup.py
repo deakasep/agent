@@ -3,7 +3,8 @@
 Aturan:
 - Dibuka hanya bila CLAU_SIGNUP_ENABLED=1 **dan** backend email siap (mail.py); selain itu 409 `signup_disabled`.
 - Satu pendaftaran = satu klien baru + satu user `client_approver` (L3, pemilik usaha) untuk klien itu. Tidak pernah
-  memberi peran agency. Klien selalu NYATA (simulation=false). Tanpa kredit gratis (paket dibayar di muka, §4b).
+  memberi peran agency. Klien selalu NYATA (simulation=false). Paket & top up dibayar di muka (§4b); satu-satunya kredit gratis = kredit
+  percobaan sekali per klien saat email pertama kali terverifikasi (kontrak core 0.15.0, pricing.md §2a).
 - Respons pendaftaran, kirim ulang verifikasi, dan lupa password selalu sama untuk email terdaftar maupun tidak
   (tidak bisa dipakai menebak email). Email terdaftar mendapat email pemberitahuan, bukan akun kedua.
 - Token di tautan email: acak 32 byte, hanya SHA-256 di database, sekali pakai, kedaluwarsa (verifikasi 48 jam,
@@ -31,6 +32,7 @@ from app.auth.access import mfa_required
 from app.auth.config import AuthSettings
 from app.auth.deps import check_origin, get_db, get_settings, now
 from app.auth.routes import EMAIL_PATTERN, LoginThrottle, audit, find_user, me_json, memberships_of, revoke_sessions, start_session
+from app.billing.ledger import grant_trial
 from app.db.models import TIMEZONES, VERTICALS, AuditLog, Client, EmailToken, Membership, User
 from app.errors import ApiError
 
@@ -182,10 +184,17 @@ def verify_email(body: TokenIn, request: Request, response: Response, db: Sessio
     if user is None or user.disabled_at is not None:
         db.rollback()
         raise ApiError(400, "invalid_token", "Tautan tidak berlaku atau sudah dipakai. Minta tautan baru.")
-    if user.email_verified_at is None:
+    first_verification = user.email_verified_at is None
+    if first_verification:
         user.email_verified_at = now()
     user.last_login_at = now()
     memberships = memberships_of(db, user.id)
+    if first_verification:
+        # Kredit percobaan (0.15.0) untuk klien mandiri milik pendaftar ini; sekali per klien, bukan SIMULASI.
+        for m in memberships:
+            client = db.get(Client, m.scope) if m.role == "client_approver" else None
+            if client is not None and client.self_serve and (entry := grant_trial(db, client.client_code)) is not None:
+                audit(db, user.id, "credit.trial_grant", "credit_entry", entry.id, client_code=client.client_code, credits=entry.delta)
     ctx = start_session(db, response, settings, user, memberships, mfa_ok=user.totp_enabled or not mfa_required(memberships))
     audit(db, user.id, "email_verified", "user", user.id)
     db.commit()

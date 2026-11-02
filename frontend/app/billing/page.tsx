@@ -125,10 +125,18 @@ export default function BillingPage() {
                 : tr(`Only ${wallet.balance.total} credits left. Top up so scheduled work doesn't stop.`, `Kredit tinggal ${wallet.balance.total}. Top up agar pekerjaan terjadwal tidak terhenti.`)}
             </p>
           )}
+          {wallet.trial && (
+            <p className="auth-notice">
+              {tr(`Trial: ${wallet.trial.credits} free credits until ${formatDate(wallet.trial.expires_at, lang)}. They are used first; choose a plan to keep your AI team working after that.`,
+                `Percobaan: ${wallet.trial.credits} kredit gratis s.d. ${formatDate(wallet.trial.expires_at, lang)}. Dipakai lebih dulu; pilih paket agar tim AI tetap bekerja setelahnya.`)}
+            </p>
+          )}
           {wallet.simulation && <p className="muted">{tr("SIMULATION client: AI jobs are free (test mode).", "Klien SIMULASI: job AI gratis (mode uji).")}</p>}
           <div className="kpis">
             <Kpi label={tr("Credits left", "Sisa kredit")} value={wallet.balance.total.toLocaleString("id-ID")}
-              hint={tr(`monthly ${wallet.balance.monthly} · top up ${wallet.balance.topup}`, `bulanan ${wallet.balance.monthly} · top up ${wallet.balance.topup}`)} />
+              hint={wallet.balance.trial > 0
+                ? tr(`trial ${wallet.balance.trial} · monthly ${wallet.balance.monthly} · top up ${wallet.balance.topup}`, `percobaan ${wallet.balance.trial} · bulanan ${wallet.balance.monthly} · top up ${wallet.balance.topup}`)
+                : tr(`monthly ${wallet.balance.monthly} · top up ${wallet.balance.topup}`, `bulanan ${wallet.balance.monthly} · top up ${wallet.balance.topup}`)} />
             <Kpi label={tr("Plan", "Paket")} value={wallet.subscription ? tr(`${wallet.subscription.plan_months} mo`, `${wallet.subscription.plan_months} bln`) : "—"}
               hint={wallet.subscription ? tr(`until ${formatDate(wallet.subscription.ends_at, lang)}`, `s.d. ${formatDate(wallet.subscription.ends_at, lang)}`) : tr("No active plan", "Belum ada paket aktif")} />
             <Kpi label={tr("Next reset", "Reset berikutnya")} value={wallet.subscription?.next_reset ? formatDate(wallet.subscription.next_reset, lang) : "—"} />

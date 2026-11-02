@@ -1,4 +1,4 @@
-"""Katalog harga & tarif kredit. Sumber: clau-market/commercial/pricing.md (Approved v1.0.0, 2026-10-29).
+"""Katalog harga & tarif kredit. Sumber: clau-market/commercial/pricing.md (Approved v1.3.0, 2026-11-02).
 
 Mengubah angka di sini wajib bersamaan dengan pricing.md dan landing page (web/src/data/pricing.ts). Nominal tagihan
 selalu diambil dari sini oleh server, tidak pernah dari browser.
@@ -12,6 +12,9 @@ CURRENCY = "IDR"
 MONTHLY_CREDITS = 500
 CREDIT_PRICE_IDR = 200  # nilai jual dasar per kredit (top up 250 kredit)
 TOPUP_VALID_MONTHS = 12
+# Kredit percobaan (pricing.md v1.3.0 §2a): sekali per klien pendaftar mandiri, dipakai paling dulu, sisa hangus.
+TRIAL_CREDITS = 50
+TRIAL_DAYS = 3
 
 # plan_months -> harga (Rp)
 PLANS: dict[int, int] = {1: 149_000, 3: 399_000, 6: 749_000, 12: 1_390_000}
@@ -55,6 +58,8 @@ def catalog() -> dict:
     return {
         "currency": CURRENCY,
         "monthly_credits": MONTHLY_CREDITS,
+        "trial_credits": TRIAL_CREDITS,
+        "trial_days": TRIAL_DAYS,
         "plans": [{"plan_months": m, "price_idr": p, "save_pct": save_pct(m)} for m, p in PLANS.items()],
         "topups": [{"credits": c, "price_idr": p} for c, p in TOPUPS.items()],
         "credit_costs": [

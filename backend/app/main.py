@@ -26,7 +26,7 @@ from app.facts import router as facts_router
 from app.registry import load_registry
 from app.workflow import router as workflow_router
 
-__version__ = "0.14.0"
+__version__ = "0.15.0"
 
 # Pengamanan (docs/security.md §3). Semua bisa diatur lewat environment di server, tanpa ubah kode.
 CLAU_ENV = os.environ.get("CLAU_ENV") or "development"
