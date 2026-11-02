@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from app.auth.access import can_access_client
 from app.auth.deps import AuthContext, current_user, get_db, require_owner
 from app.billing.catalog import PLANS, TOPUPS, catalog
-from app.billing.ledger import active_subscription, apply_paid, balances, current_period, ensure_credits, ensure_topup_expiry, lock, now
+from app.billing.ledger import active_subscription, apply_paid, balances, current_period, ensure_credits, ensure_topup_expiry, lock, now, trial_status
 from app.billing.topup_expiry import next_expiry
 from app.billing.provider import (
     GatewayError,
@@ -83,8 +83,11 @@ def get_wallet(client_code: str = Query(pattern=CLIENT_CODE_RE), ctx: AuthContex
         subscription = {"plan_months": sub.plan_months, "starts_at": iso(sub.starts_at), "ends_at": iso(sub.ends_at),
                         "active": True, "period_start": iso(start), "next_reset": iso(nxt) if nxt < sub.ends_at else None}
     topup_next_expiry = {"credits": expiry["credits"], "expires_at": iso(expiry["expires_at"])} if expiry else None
+    trial = trial_status(db, client_code)
     return {"client_code": client_code, "balance": balances(db, client_code), "subscription": subscription,
-            "topup_next_expiry": topup_next_expiry, "simulation": client.simulation}
+            "topup_next_expiry": topup_next_expiry,
+            "trial": {"credits": trial["credits"], "expires_at": iso(trial["expires_at"])} if trial else None,
+            "simulation": client.simulation}
 
 
 @router.get("/ledger")

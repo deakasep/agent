@@ -1,4 +1,4 @@
-"""Buku kredit: saldo, hibah bulanan & hangus top up (lazy, tanpa cron), pemotongan untuk job AI, efek pembayaran lunas.
+"""Buku kredit: saldo, hibah bulanan, kredit percobaan & hangus top up/percobaan (lazy, tanpa cron), pemotongan untuk job AI, efek pembayaran lunas.
 
 Semua penulisan ke credit_ledger dikunci per klien (advisory lock yang sama dengan trigger migrasi 0008), jadi cek
 saldo + tulis tidak balapan. Aturan akhirnya tetap ditegakkan database (credit_entry_invalid / credit_insufficient).
@@ -12,9 +12,9 @@ from datetime import date, datetime, timedelta, timezone
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
-from app.billing.catalog import MONTHLY_CREDITS, TOPUP_VALID_MONTHS
+from app.billing.catalog import MONTHLY_CREDITS, TOPUP_VALID_MONTHS, TRIAL_CREDITS, TRIAL_DAYS
 from app.billing.topup_expiry import Entry, Result, plan
-from app.db.models import AuditLog, CreditEntry, Payment, Subscription
+from app.db.models import AuditLog, Client, CreditEntry, Payment, Subscription
 from app.errors import ApiError
 
 WITA = timezone(timedelta(hours=8))
@@ -40,8 +40,8 @@ def balances(db: Session, client_code: str) -> dict[str, int]:
         select(CreditEntry.bucket, func.coalesce(func.sum(CreditEntry.delta), 0))
         .where(CreditEntry.client_code == client_code).group_by(CreditEntry.bucket)
     ).all())
-    monthly, topup = int(rows.get("monthly", 0)), int(rows.get("topup", 0))
-    return {"monthly": monthly, "topup": topup, "total": monthly + topup}
+    monthly, topup, trial = int(rows.get("monthly", 0)), int(rows.get("topup", 0)), int(rows.get("trial", 0))
+    return {"monthly": monthly, "topup": topup, "trial": trial, "total": monthly + topup + trial}
 
 
 def active_subscription(db: Session, client_code: str, at: datetime) -> Subscription | None:
@@ -125,25 +125,72 @@ def ensure_topup_expiry(db: Session, client_code: str, at: datetime | None = Non
     return result
 
 
+def trial_grant(db: Session, client_code: str) -> CreditEntry | None:
+    return db.scalar(select(CreditEntry).where(CreditEntry.client_code == client_code, CreditEntry.reason == "trial_grant"))
+
+
+def grant_trial(db: Session, client_code: str, at: datetime | None = None) -> CreditEntry | None:
+    """Kredit percobaan (pricing.md §2a): sekali per klien, bukan klien SIMULASI. Sudah pernah = tidak diberi lagi
+    (database juga menolak lewat uq_credit_ledger_trial). Mengembalikan baris hibah baru, atau None."""
+    if TRIAL_CREDITS <= 0:
+        return None
+    at = at or now()
+    lock(db, client_code)
+    client = db.get(Client, client_code)
+    if client is None or client.simulation or trial_grant(db, client_code) is not None:
+        return None
+    entry = CreditEntry(client_code=client_code, delta=TRIAL_CREDITS, bucket="trial", reason="trial_grant",
+                        expires_at=at + timedelta(days=TRIAL_DAYS))
+    db.add(entry)
+    db.flush()
+    return entry
+
+
+def ensure_trial_expiry(db: Session, client_code: str) -> None:
+    """Sisa kredit percobaan yang lewat masa berlakunya dihanguskan lewat `trial_expire` (migrasi 0012). Lazy & idempoten;
+    refund job ke `trial` setelah hangus ikut dihanguskan saat berikutnya. Batas waktu = now() transaksi database, sama
+    persis dengan trigger: setelah fungsi ini, sisa `trial` pasti masih boleh dipakai."""
+    lock(db, client_code)
+    grant = trial_grant(db, client_code)
+    if grant is None or grant.expires_at > db.scalar(select(func.now())):
+        return
+    left = balances(db, client_code)["trial"]
+    if left > 0:
+        db.add(CreditEntry(client_code=client_code, delta=-left, bucket="trial", reason="trial_expire"))
+        db.flush()
+
+
+def trial_status(db: Session, client_code: str) -> dict | None:
+    """Sisa kredit percobaan yang masih berlaku dan tanggal hangusnya (panggil setelah ensure_credits)."""
+    left = balances(db, client_code)["trial"]
+    grant = trial_grant(db, client_code)
+    if left <= 0 or grant is None:
+        return None
+    return {"credits": left, "expires_at": grant.expires_at}
+
+
 def ensure_credits(db: Session, client_code: str, at: datetime | None = None) -> Result:
-    """Kredit bulanan periode berjalan + hangus top up kedaluwarsa, dalam satu kunci per klien."""
+    """Kredit bulanan periode berjalan + hangus kredit percobaan & top up kedaluwarsa, dalam satu kunci per klien."""
     at = at or now()
     ensure_monthly(db, client_code, at)
+    ensure_trial_expiry(db, client_code)
     return ensure_topup_expiry(db, client_code, at)
 
 
 def charge(db: Session, client_code: str, credits: int, ai_job_id: int) -> list[CreditEntry]:
-    """Potong kredit untuk job AI yang baru dibuat: bulanan dulu, lalu top up (yang paling cepat kedaluwarsa; pembagian
-    per top up dihitung app/billing/topup_expiry.py). Saldo kurang → 402, sebelum commit."""
+    """Potong kredit untuk job AI yang baru dibuat: kredit percobaan yang masih berlaku dulu, lalu bulanan, lalu top up
+    (yang paling cepat kedaluwarsa; pembagian per top up dihitung app/billing/topup_expiry.py). Saldo kurang → 402,
+    sebelum commit."""
     ensure_credits(db, client_code)
     bal = balances(db, client_code)
     if bal["total"] < credits:
         raise ApiError(402, "credits_insufficient", f"Kredit tidak cukup: butuh {credits}, sisa {bal['total']}. Top up dari dashboard.")
-    from_monthly = min(bal["monthly"], credits)
-    rows = []
-    for bucket, amount in (("monthly", from_monthly), ("topup", credits - from_monthly)):
+    rows, left = [], credits
+    for bucket in ("trial", "monthly", "topup"):
+        amount = min(bal[bucket], left)
         if amount > 0:
             rows.append(CreditEntry(client_code=client_code, delta=-amount, bucket=bucket, reason="usage", ai_job_id=ai_job_id))
+            left -= amount
     db.add_all(rows)
     db.flush()
     return rows

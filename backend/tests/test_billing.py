@@ -1,4 +1,4 @@
-"""Langganan & kredit (kontrak core 0.11.0 + 0.14.0 hangus top up, AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0), ke PostgreSQL sungguhan.
+"""Langganan & kredit (kontrak core 0.11.0 + 0.14.0 hangus top up + 0.15.0 kredit percobaan, AI-CONSTITUTION v4.0.0 §4b, AI-BOUNDARY 2.0.0), ke PostgreSQL sungguhan.
 
 Menguji: katalog sama dengan registry & harga publik, checkout (peran, nominal dari server, satu tagihan pending),
 lunas lewat simulasi owner dan webhook Midtrans bertanda tangan (idempoten, nominal dicek), kredit bulanan (hibah &
@@ -102,6 +102,7 @@ def test_catalog_is_public_and_complete():
     assert r.status_code == 200
     data = r.json()
     assert data["monthly_credits"] == 500 and data["currency"] == "IDR"
+    assert (data["trial_credits"], data["trial_days"]) == (50, 3)
     assert [(p["plan_months"], p["price_idr"]) for p in data["plans"]] == [(1, 149000), (3, 399000), (6, 749000), (12, 1390000)]
     caption = next(c for c in data["credit_costs"] if c["intent"] == "caption")
     assert caption == {"intent": "caption", "agent": "Tara", "credits": 8, "status": "active"}
@@ -137,7 +138,7 @@ def test_checkout_roles_amount_and_single_pending(factory, team, bill, monkeypat
     assert r.status_code == 409 and r.json()["error"]["code"] == "payment_not_pending"
 
     w = wallet(approver, "BILA")
-    assert w["balance"] == {"monthly": 500, "topup": 0, "total": 500}
+    assert w["balance"] == {"monthly": 500, "topup": 0, "trial": 0, "total": 500}
     assert w["subscription"]["plan_months"] == 3 and w["subscription"]["active"] and w["subscription"]["next_reset"]
     reasons = [e["reason"] for e in approver.get("/billing/ledger", client_code="BILA").json()["items"]]
     assert reasons == ["monthly_grant"]
@@ -180,7 +181,7 @@ def test_midtrans_webhook_is_signed_checked_and_idempotent(factory, team, bill, 
     good = {**body, "signature_key": sign(pay["order_id"], "200", "100000.00", SERVER_KEY)}
     assert hook.post("/billing/webhooks/midtrans", json=good).json() == {"ok": True}
     assert hook.post("/billing/webhooks/midtrans", json=good).json() == {"ok": True}  # notifikasi ulang
-    assert wallet(approver, "BILB")["balance"] == {"monthly": 0, "topup": 550, "total": 550}
+    assert wallet(approver, "BILB")["balance"] == {"monthly": 0, "topup": 550, "trial": 0, "total": 550}
     with factory() as s:
         p = s.get(Payment, pay["id"])
         assert (p.status, p.method) == ("paid", "qris")
@@ -290,7 +291,7 @@ def test_topup_expires_after_twelve_months_and_wallet_shows_next_expiry(factory,
     new = paid_topup(factory, team["owner"].id, "BILD", 550, t - timedelta(days=30))
 
     w = wallet(approver, "BILD")
-    assert w["balance"] == {"monthly": 0, "topup": 550, "total": 550}
+    assert w["balance"] == {"monthly": 0, "topup": 550, "trial": 0, "total": 550}
     assert w["topup_next_expiry"]["credits"] == 550
     items = approver.get("/billing/ledger", client_code="BILD").json()["items"]
     assert [(e["reason"], e["delta"], e["payment_id"]) for e in items if e["reason"] == "topup_expire"] == [("topup_expire", -250, old)]
@@ -325,3 +326,62 @@ def test_fresh_topup_is_not_expired_early(factory, team, bill):
         result = ensure_credits(s, "BILA")
         assert balances(s, "BILA")["topup"] == 250
         assert sum(x.remaining for x in result.open_lots) == 250
+
+
+# --- Kredit percobaan (kontrak core 0.15.0, migrasi 0012) ------------------------------------------------------------
+
+
+def test_trial_is_used_first_then_expires_and_database_guards_it(factory, team, ai, monkeypatch):
+    from sqlalchemy import text
+
+    from app.billing.ledger import ensure_credits, grant_trial
+
+    monkeypatch.setenv("CLAU_AI_PROVIDER", "stub")
+    with factory() as s, s.begin():
+        s.add(Client(client_code="BILT", vertical="food-beverage", business_type="cafe", approver_role="pemilik", self_serve=True))
+    approver = Actor(factory, "client_approver", scope="BILT", level="L3")
+    with factory() as s, s.begin():
+        assert grant_trial(s, "BILT") is not None
+        assert grant_trial(s, "BILT") is None  # sekali per klien
+        assert grant_trial(s, "CTHSIM") is None  # klien SIMULASI tidak dapat
+    paid_topup(factory, team["owner"].id, "BILT", 250, datetime.now(timezone.utc) - timedelta(days=1))
+    assert wallet(approver, "BILT")["balance"] == {"monthly": 0, "topup": 250, "trial": 50, "total": 300}
+
+    # Pemakaian memotong kredit percobaan lebih dulu.
+    fact_sheet(factory, client="BILT", keys=("facility.pool-private",), confirmer=approver.id)
+    req = new_request(team["staff"], client="BILT")
+    r = ask_ai(team["staff"], req["id"])
+    assert r.status_code == 202, r.text
+    usage = [(e["bucket"], e["delta"]) for e in approver.get("/billing/ledger", client_code="BILT").json()["items"]
+             if e["ai_job_id"] == r.json()["id"]]
+    assert usage == [("trial", -8)]
+    assert wallet(approver, "BILT")["trial"]["credits"] == 42
+
+    with factory() as s:
+        # Hibah kedua, hangus sebelum waktunya, penyesuaian ke trial, dan hibah untuk klien SIMULASI ditolak.
+        violates(s, "uq_credit_ledger_trial",
+                 "INSERT INTO credit_ledger (client_code, delta, bucket, reason, expires_at) VALUES ('BILT', 50, 'trial', 'trial_grant', now() + interval '3 days')")
+        violates(s, "credit_entry_invalid", "INSERT INTO credit_ledger (client_code, delta, bucket, reason) VALUES ('BILT', -1, 'trial', 'trial_expire')")
+        violates(s, "credit_entry_invalid",
+                 "INSERT INTO credit_ledger (client_code, delta, bucket, reason, note, created_by) VALUES ('BILT', 5, 'trial', 'adjustment', 'bonus', :u)",
+                 {"u": team["owner"].id})
+        violates(s, "credit_entry_invalid",
+                 "INSERT INTO credit_ledger (client_code, delta, bucket, reason, expires_at) VALUES ('CTHSIM', 50, 'trial', 'trial_grant', now() + interval '3 days')")
+        violates(s, "credit_entry_invalid",
+                 "INSERT INTO credit_ledger (client_code, delta, bucket, reason, expires_at) VALUES ('BILC', 50, 'monthly', 'trial_grant', now() + interval '3 days')")
+
+    # Klien lain dengan kredit percobaan yang sudah lewat: sisa hangus otomatis, pemakaian trial ditolak database.
+    with factory() as s, s.begin():
+        s.add(Client(client_code="BILU", vertical="food-beverage", business_type="cafe", approver_role="pemilik", self_serve=True))
+        s.flush()
+        s.execute(text("INSERT INTO credit_ledger (client_code, delta, bucket, reason, expires_at)"
+                       " VALUES ('BILU', 50, 'trial', 'trial_grant', now() - interval '1 hour')"))
+    with factory() as s, s.begin():
+        ensure_credits(s, "BILU")
+        assert balances(s, "BILU")["trial"] == 0
+        ensure_credits(s, "BILU")  # idempoten
+    with factory() as s:
+        rows = s.execute(select(CreditEntry.reason, CreditEntry.delta).where(CreditEntry.client_code == "BILU")).all()
+        assert sorted(tuple(r) for r in rows) == [("trial_expire", -50), ("trial_grant", 50)]
+    bilu = Actor(factory, "client_approver", scope="BILU", level="L3")
+    assert wallet(bilu, "BILU")["trial"] is None

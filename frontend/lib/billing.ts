@@ -1,8 +1,12 @@
-// Tipe & format langganan & kredit (kontrak core api-contracts 0.11.0 § Langganan & Kredit; 0.14.0 hangus top up).
+// Tipe & format langganan & kredit (kontrak core api-contracts 0.11.0 § Langganan & Kredit; 0.14.0 hangus top up;
+// 0.15.0 kredit percobaan).
 
 export type Catalog = {
   currency: "IDR";
   monthly_credits: number;
+  /** 0.15.0: kredit percobaan sekali per akun. */
+  trial_credits: number;
+  trial_days: number;
   plans: { plan_months: number; price_idr: number; save_pct: number }[];
   topups: { credits: number; price_idr: number }[];
   credit_costs: { intent: string; agent: string | null; credits: number; status: string }[];
@@ -10,10 +14,12 @@ export type Catalog = {
 
 export type Wallet = {
   client_code: string;
-  balance: { monthly: number; topup: number; total: number };
+  balance: { monthly: number; topup: number; trial: number; total: number };
   subscription: { plan_months: number; starts_at: string; ends_at: string; active: boolean; period_start: string; next_reset: string | null } | null;
   /** 0.14.0: sisa kredit top up yang paling cepat hangus (12 bulan sejak lunas). */
   topup_next_expiry: { credits: number; expires_at: string } | null;
+  /** 0.15.0: sisa kredit percobaan yang masih berlaku dan tanggal hangusnya. */
+  trial: { credits: number; expires_at: string } | null;
   simulation: boolean;
 };
 
@@ -21,8 +27,8 @@ export type CreditEntry = {
   id: number;
   client_code: string;
   delta: number;
-  bucket: "monthly" | "topup";
-  reason: "monthly_grant" | "monthly_expire" | "topup" | "topup_expire" | "usage" | "refund" | "adjustment";
+  bucket: "monthly" | "topup" | "trial";
+  reason: "monthly_grant" | "monthly_expire" | "topup" | "topup_expire" | "trial_grant" | "trial_expire" | "usage" | "refund" | "adjustment";
   ai_job_id: number | null;
   payment_id: number | null;
   note: string | null;
@@ -54,6 +60,8 @@ export const REASON: Record<CreditEntry["reason"], [string, string]> = {
   monthly_expire: ["Unused monthly credits expired", "Sisa kredit bulanan hangus"],
   topup_expire: ["Top-up credits expired (12 months)", "Sisa kredit top up hangus (12 bulan)"],
   topup: ["Top up", "Top up"],
+  trial_grant: ["Trial credits", "Kredit percobaan"],
+  trial_expire: ["Unused trial credits expired", "Sisa kredit percobaan hangus"],
   usage: ["AI job", "Job AI"],
   refund: ["Refund (job failed or cancelled)", "Kredit kembali (job gagal/dibatalkan)"],
   adjustment: ["Adjustment by owner", "Penyesuaian owner"],

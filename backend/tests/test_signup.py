@@ -178,3 +178,26 @@ def test_signup_requires_allowed_origin(open_signup):
     evil = client()  # app yang sama dengan override database (test lain bisa me-reload app.main)
     evil.headers["origin"] = "https://evil.example"
     assert evil.post("/auth/signup", json=form()).status_code == 403
+
+
+def test_first_verification_grants_trial_credits_once(open_signup):
+    # Kredit percobaan (kontrak core 0.15.0, pricing.md §2a): 50 kredit, 3 hari, sekali per klien mandiri.
+    from app.billing.catalog import TRIAL_CREDITS, TRIAL_DAYS
+    from app.db.models import CreditEntry
+
+    body = form()
+    assert client().post("/auth/signup", json=body).status_code == 202
+    token = link_token("verifikasi-email")
+    c = client()
+    assert c.post("/auth/verify-email", json={"token": token}).status_code == 200
+    code = c.get("/auth/me").json()["user"]["memberships"][0]["scope"]
+    w = c.get("/billing/wallet", params={"client_code": code}).json()
+    assert w["balance"] == {"monthly": 0, "topup": 0, "trial": TRIAL_CREDITS, "total": TRIAL_CREDITS}
+    assert w["trial"]["credits"] == TRIAL_CREDITS and w["subscription"] is None
+    with open_signup() as s:
+        grants = list(s.scalars(select(CreditEntry).where(CreditEntry.client_code == code, CreditEntry.reason == "trial_grant")))
+        assert len(grants) == 1
+        assert timedelta(days=TRIAL_DAYS) - timedelta(minutes=5) < grants[0].expires_at - now() <= timedelta(days=TRIAL_DAYS)
+
+    # Token yang sama tidak bisa dipakai lagi, jadi tidak ada jalan memberi kredit percobaan kedua.
+    assert client().post("/auth/verify-email", json={"token": token}).status_code == 400
