@@ -2,8 +2,8 @@
 FakeProvider (app/ai/provider.py).
 
 Aktif hanya bila owner mengisi di .env server: `CLAU_AI_PROVIDER=claude`, `ANTHROPIC_API_KEY`, dan tarif model
-(`CLAU_AI_PRICE_*`, mikro-USD per juta token). Kunci API hanya di container `worker`. Tarif tidak pernah ditulis di kode: biaya setiap panggilan dihitung dari
-tarif owner supaya batas biaya (budget) tetap bekerja. Salah satu kosong = AI mati (fail closed, app/ai/config.py).
+(`CLAU_AI_PRICE_INPUT_MICRO_USD` & `CLAU_AI_PRICE_OUTPUT_MICRO_USD`, mikro-USD per juta token). Kunci API hanya
+di container `worker`. Tarif tidak pernah ditulis di kode: biaya setiap panggilan dihitung dari tarif owner supaya batas biaya (budget) tetap bekerja. Salah satu kosong = AI mati (fail closed, app/ai/config.py).
 
 Data yang dikirim: aturan + agent (system, di-cache), fakta yang DISETUJUI klien, teks request yang sudah disamarkan
 (AI-BOUNDARY § Data ke Provider AI). Jawaban wajib JSON terstruktur: isi draft + klaim; label bukti klaim tetap
@@ -116,7 +116,8 @@ class ClaudeProvider:
         self.key = key if key is not None else (os.environ.get("ANTHROPIC_API_KEY") or "").strip()
         self.rates = rates or rates_from_env()
         if not self.key or self.rates is None:
-            raise ValueError("provider claude belum dikonfigurasi (ANTHROPIC_API_KEY & CLAU_AI_PRICE_*)")
+            raise ValueError("provider claude belum dikonfigurasi: ANTHROPIC_API_KEY, "
+                             "CLAU_AI_PRICE_INPUT_MICRO_USD, CLAU_AI_PRICE_OUTPUT_MICRO_USD")
         self.model = model or model_for("standar")
         self.max_output_tokens = max_output_tokens or min(_positive_int("CLAU_AI_MAX_OUTPUT_TOKENS") or 4000, 32000)
         self.timeout_s = timeout_s or min(_positive_int("CLAU_AI_CALL_TIMEOUT_S") or 300, 900)
