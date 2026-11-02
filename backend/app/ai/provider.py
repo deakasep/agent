@@ -2,7 +2,7 @@
 
 Provider menerima `Prompt` (sudah disamarkan, hanya fakta yang dikonfirmasi klien) dan mengembalikan `Generation`:
 isi draft + klaim terstruktur. Label bukti klaim TIDAK ditentukan provider: worker menentukannya lewat AI fact-check
-(app/ai/factcheck.py). Provider Claude (Tahap 2 PR 4c) mengikuti antarmuka yang sama.
+(app/ai/factcheck.py). Provider Claude (Tahap 2 PR 4c, app/ai/claude.py) mengikuti antarmuka yang sama.
 """
 
 from __future__ import annotations
@@ -104,4 +104,8 @@ class FakeProvider:
 def get_provider(name: str):
     if name == "fake":
         return FakeProvider()
+    if name == "claude":
+        from app.ai.claude import ClaudeProvider  # impor tunda: provider.py dipakai claude.py
+
+        return ClaudeProvider()
     raise ValueError(f"provider AI tidak dikenal: {name}")

@@ -6,7 +6,9 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
-PROVIDERS = ("fake",)  # provider Claude menyusul (Tahap 2 PR 4c)
+from app.ai.claude import claude_ready
+
+PROVIDERS = ("fake", "claude")  # claude = app/ai/claude.py (Tahap 2 PR 4c), aktif hanya bila kunci & tarif terisi
 
 
 @dataclass(frozen=True)
@@ -31,7 +33,9 @@ def ai_settings() -> AiSettings:
     provider = (os.environ.get("CLAU_AI_PROVIDER") or "fake").strip()
     return AiSettings(
         # Fail closed: AI mati kecuali diaktifkan eksplisit, dan provider tak dikenal = mati.
-        enabled=os.environ.get("CLAU_AI_ENABLED") == "1" and provider in PROVIDERS,
+        # Provider claude tanpa kunci API atau tarif model = mati juga (biaya harus bisa dihitung untuk batas biaya).
+        enabled=os.environ.get("CLAU_AI_ENABLED") == "1" and provider in PROVIDERS
+        and (provider != "claude" or claude_ready()),
         provider=provider,
         intents=frozenset(i.strip() for i in (os.environ.get("CLAU_AI_INTENTS") or "caption").split(",") if i.strip()),
         job_estimate_micro_usd=_int("CLAU_AI_JOB_ESTIMATE_MICRO_USD", 200_000, 0, 100_000_000),
